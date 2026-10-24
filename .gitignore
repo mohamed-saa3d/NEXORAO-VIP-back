@@ -6,3 +6,4 @@ dist/
 /src/generated/prisma
 *.log
 .DS_Store
+scripts/*.txt

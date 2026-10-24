@@ -1,9 +1,11 @@
 {
   "meta": {
-    "generatedAt": "2026-10-24T18:49:27.330Z",
+    "generatedAt": "2026-10-24T19:12:42.308Z",
     "prismaVersion": "7.10.1",
     "database": "PostgreSQL 17 (Neon)",
     "modelCount": 33,
+    "relationCount": 29,
+    "totalIndexCount": 106,
     "tenantIsolation": "PostgreSQL RLS via app.current_store_id (set_config)"
   },
   "stores": [
@@ -89,13 +91,33 @@
           "domain"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "code"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "domain"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -104,19 +126,22 @@
           "columnName": "code",
           "type": "varchar(50)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "name",
           "columnName": "name",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "domain",
           "columnName": "domain",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
@@ -124,6 +149,7 @@
           "columnName": "default_locale",
           "type": "varchar(5)",
           "nullable": false,
+          "isRelation": false,
           "default": "ar"
         },
         {
@@ -131,6 +157,7 @@
           "columnName": "currency",
           "type": "varchar(3)",
           "nullable": false,
+          "isRelation": false,
           "default": "EUR"
         },
         {
@@ -138,6 +165,7 @@
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
@@ -145,6 +173,7 @@
           "columnName": "version",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -152,6 +181,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -159,10 +189,27 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
+        },
+        {
+          "name": "settings",
+          "columnName": "settings",
+          "type": "StoreSettings",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "StoreSettings"
+        },
+        {
+          "name": "users",
+          "columnName": "users",
+          "type": "User",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "User"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "StoreSettings",
@@ -176,13 +223,27 @@
           "storeId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -191,19 +252,22 @@
           "columnName": "store_id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "invoicePrefix",
           "columnName": "invoice_prefix",
           "type": "varchar(20)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "nextInvoiceNumber",
           "columnName": "next_invoice_number",
           "type": "bigint",
           "nullable": false,
+          "isRelation": false,
           "default": 1
         },
         {
@@ -211,6 +275,7 @@
           "columnName": "vat_rate",
           "type": "decimal(5, 4)",
           "nullable": false,
+          "isRelation": false,
           "default": 0.19
         },
         {
@@ -218,6 +283,7 @@
           "columnName": "vat_included_in_price",
           "type": "boolean",
           "nullable": false,
+          "isRelation": false,
           "default": true
         },
         {
@@ -225,13 +291,15 @@
           "columnName": "markup_percentage",
           "type": "decimal(5, 2)",
           "nullable": false,
+          "isRelation": false,
           "default": 45
         },
         {
           "name": "allowedLocales",
           "columnName": "allowed_locales",
           "type": "text[]",
-          "nullable": true,
+          "nullable": false,
+          "isRelation": false,
           "array": true,
           "default": [
             "ar",
@@ -244,6 +312,7 @@
           "columnName": "refund_window_days",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 14
         },
         {
@@ -251,6 +320,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -258,13 +328,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "store",
-          "toModel": "Store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
           "fromFields": [
             "storeId"
           ],
@@ -272,8 +345,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -290,13 +362,28 @@
           "email"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "storeId",
+            "email"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -304,37 +391,43 @@
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "email",
           "columnName": "email",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "passwordHash",
           "columnName": "password_hash",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "name",
           "columnName": "name",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "phone",
           "columnName": "phone",
           "type": "varchar(50)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "role",
           "columnName": "role",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "customer"
         },
         {
@@ -342,19 +435,22 @@
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
           "name": "emailVerifiedAt",
           "columnName": "email_verified_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "tokenVersion",
           "columnName": "token_version",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -362,6 +458,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -369,13 +466,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "store",
-          "toModel": "Store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Store",
           "fromFields": [
             "storeId"
           ],
@@ -383,8 +483,25 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "sessions",
+          "columnName": "sessions",
+          "type": "UserSession",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "UserSession"
+        },
+        {
+          "name": "addresses",
+          "columnName": "addresses",
+          "type": "Address",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Address"
         }
       ]
     },
@@ -401,12 +518,36 @@
         ]
       ],
       "indexes": [
-        [
-          "userId"
-        ],
-        [
-          "expiresAt"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "refreshTokenHash"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "userId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "expiresAt"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -414,6 +555,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -421,57 +563,67 @@
           "name": "userId",
           "columnName": "user_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "refreshTokenHash",
           "columnName": "refresh_token_hash",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "userAgent",
           "columnName": "user_agent",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "ipAddress",
           "columnName": "ip_address",
           "type": "varchar(45)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "expiresAt",
           "columnName": "expires_at",
           "type": "timestamptz",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "revokedAt",
           "columnName": "revoked_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "user",
-          "toModel": "User",
+          "columnName": "user",
+          "type": "User",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "User",
           "fromFields": [
             "userId"
           ],
@@ -479,8 +631,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -493,10 +644,25 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "userId",
-          "storeId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "userId",
+            "storeId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -504,6 +670,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -511,61 +678,71 @@
           "name": "userId",
           "columnName": "user_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "recipientName",
           "columnName": "recipient_name",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "phone",
           "columnName": "phone",
           "type": "varchar(50)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "countryCode",
           "columnName": "country_code",
           "type": "varchar(2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "city",
           "columnName": "city",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "postalCode",
           "columnName": "postal_code",
           "type": "varchar(20)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "addressLine1",
           "columnName": "address_line1",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "addressLine2",
           "columnName": "address_line2",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "isDefault",
           "columnName": "is_default",
           "type": "boolean",
           "nullable": false,
+          "isRelation": false,
           "default": false
         },
         {
@@ -573,6 +750,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -580,19 +758,23 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
         },
         {
           "name": "deletedAt",
           "columnName": "deleted_at",
           "type": "timestamptz",
-          "nullable": true
-        }
-      ],
-      "relations": [
+          "nullable": true,
+          "isRelation": false
+        },
         {
           "name": "user",
-          "toModel": "User",
+          "columnName": "user",
+          "type": "User",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "User",
           "fromFields": [
             "userId"
           ],
@@ -600,8 +782,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -617,13 +798,27 @@
           "code"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "code"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -632,19 +827,22 @@
           "columnName": "code",
           "type": "varchar(50)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "name",
           "columnName": "name",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
@@ -652,6 +850,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -659,10 +858,37 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
+        },
+        {
+          "name": "connections",
+          "columnName": "connections",
+          "type": "SupplierConnection",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierConnection"
+        },
+        {
+          "name": "products",
+          "columnName": "products",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Product"
+        },
+        {
+          "name": "supplierProducts",
+          "columnName": "supplierProducts",
+          "type": "SupplierProduct",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierProduct"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "SupplierConnection",
@@ -677,13 +903,28 @@
           "storeId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "supplierId",
+            "storeId"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -691,56 +932,65 @@
           "name": "supplierId",
           "columnName": "supplier_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "disconnected"
         },
         {
           "name": "accessTokenEncrypted",
           "columnName": "access_token_encrypted",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "refreshTokenEncrypted",
           "columnName": "refresh_token_encrypted",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "tokenExpiresAt",
           "columnName": "token_expires_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "lastVerifiedAt",
           "columnName": "last_verified_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "lastError",
           "columnName": "last_error",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -748,13 +998,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "supplier",
-          "toModel": "Supplier",
+          "columnName": "supplier",
+          "type": "Supplier",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Supplier",
           "fromFields": [
             "supplierId"
           ],
@@ -762,8 +1015,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -779,13 +1031,33 @@
           "slug"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "slug"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "parentId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -793,13 +1065,15 @@
           "name": "parentId",
           "columnName": "parent_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "slug",
           "columnName": "slug",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
@@ -807,6 +1081,7 @@
           "columnName": "sort_order",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -814,6 +1089,7 @@
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
@@ -821,6 +1097,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -828,13 +1105,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "parent",
-          "toModel": "Category",
+          "columnName": "parent",
+          "type": "Category",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Category",
           "fromFields": [
             "parentId"
           ],
@@ -842,8 +1122,34 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "children",
+          "columnName": "children",
+          "type": "Category",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Category"
+        },
+        {
+          "name": "translations",
+          "columnName": "translations",
+          "type": "CategoryTranslation",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "CategoryTranslation"
+        },
+        {
+          "name": "products",
+          "columnName": "products",
+          "type": "ProductCategory",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductCategory"
         }
       ]
     },
@@ -860,13 +1166,28 @@
           "locale"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "categoryId",
+            "locale"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -874,31 +1195,37 @@
           "name": "categoryId",
           "columnName": "category_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "locale",
           "columnName": "locale",
           "type": "varchar(5)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "name",
           "columnName": "name",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "description",
           "columnName": "description",
           "type": "text",
-          "nullable": true
-        }
-      ],
-      "relations": [
+          "nullable": true,
+          "isRelation": false
+        },
         {
           "name": "category",
-          "toModel": "Category",
+          "columnName": "category",
+          "type": "Category",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Category",
           "fromFields": [
             "categoryId"
           ],
@@ -906,8 +1233,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -924,12 +1250,30 @@
         ]
       ],
       "indexes": [
-        [
-          "supplierId"
-        ],
-        [
-          "status"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "slug"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "supplierId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "status"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -937,6 +1281,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -944,45 +1289,52 @@
           "name": "supplierId",
           "columnName": "supplier_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "slug",
           "columnName": "slug",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "brand",
           "columnName": "brand",
           "type": "varchar(100)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
           "name": "createdBy",
           "columnName": "created_by",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "lastSyncedAt",
           "columnName": "last_synced_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -990,13 +1342,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "supplier",
-          "toModel": "Supplier",
+          "columnName": "supplier",
+          "type": "Supplier",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Supplier",
           "fromFields": [
             "supplierId"
           ],
@@ -1004,8 +1359,52 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "translations",
+          "columnName": "translations",
+          "type": "ProductTranslation",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductTranslation"
+        },
+        {
+          "name": "variants",
+          "columnName": "variants",
+          "type": "ProductVariant",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductVariant"
+        },
+        {
+          "name": "images",
+          "columnName": "images",
+          "type": "ProductImage",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductImage"
+        },
+        {
+          "name": "categories",
+          "columnName": "categories",
+          "type": "ProductCategory",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductCategory"
+        },
+        {
+          "name": "supplierLinks",
+          "columnName": "supplierLinks",
+          "type": "SupplierProduct",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierProduct"
         }
       ]
     },
@@ -1022,13 +1421,28 @@
           "locale"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "productId",
+            "locale"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1036,43 +1450,51 @@
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "locale",
           "columnName": "locale",
           "type": "varchar(5)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "name",
           "columnName": "name",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "description",
           "columnName": "description",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "seoTitle",
           "columnName": "seo_title",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "seoDescription",
           "columnName": "seo_description",
           "type": "text",
-          "nullable": true
-        }
-      ],
-      "relations": [
+          "nullable": true,
+          "isRelation": false
+        },
         {
           "name": "product",
-          "toModel": "Product",
+          "columnName": "product",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Product",
           "fromFields": [
             "productId"
           ],
@@ -1080,14 +1502,13 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
     {
       "name": "ProductVariant",
-      "table": "productvariant",
+      "table": "product_variants",
       "group": "catalog",
       "primaryKey": [
         "id"
@@ -1097,13 +1518,39 @@
           "sku"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "sku"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "productId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "availableQuantity"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1111,23 +1558,173 @@
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "sku",
           "columnName": "sku",
           "type": "varchar(100)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "attributes",
           "columnName": "attributes",
           "type": "jsonb",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false,
+          "default": "{}"
+        },
+        {
+          "name": "barcode",
+          "columnName": "barcode",
+          "type": "varchar(50)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "supplierCost",
+          "columnName": "supplier_cost",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "supplierCurrency",
+          "columnName": "supplier_currency",
+          "type": "varchar(3)",
+          "nullable": false,
+          "isRelation": false,
+          "default": "USD"
+        },
+        {
+          "name": "sellingPrice",
+          "columnName": "selling_price",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "sellingCurrency",
+          "columnName": "selling_currency",
+          "type": "varchar(3)",
+          "nullable": false,
+          "isRelation": false,
+          "default": "EUR"
+        },
+        {
+          "name": "exchangeRateAtSync",
+          "columnName": "exchange_rate_at_sync",
+          "type": "decimal(10, 4)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "weightGrams",
+          "columnName": "weight_grams",
+          "type": "integer",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "dimensions",
+          "columnName": "dimensions",
+          "type": "jsonb",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "availableQuantity",
+          "columnName": "available_quantity",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false,
+          "default": 0
+        },
+        {
+          "name": "reservedQuantity",
+          "columnName": "reserved_quantity",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false,
+          "default": 0
+        },
+        {
+          "name": "lastSyncedAt",
+          "columnName": "last_synced_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "supplierStockStatus",
+          "columnName": "supplier_stock_status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "isRelation": false,
+          "default": "unknown"
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "isRelation": false,
+          "default": "active"
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isRelation": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isRelation": false,
+          "isUpdatedAt": true
+        },
+        {
+          "name": "product",
+          "columnName": "product",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Product",
+          "fromFields": [
+            "productId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null
+        },
+        {
+          "name": "supplierLinks",
+          "columnName": "supplierLinks",
+          "type": "SupplierVariant",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierVariant"
+        },
+        {
+          "name": "images",
+          "columnName": "images",
+          "type": "ProductImage",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ProductImage"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "ProductImage",
@@ -1138,9 +1735,24 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "productId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "productId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "variantId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -1148,6 +1760,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1155,31 +1768,36 @@
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "variantId",
           "columnName": "variant_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "url",
           "columnName": "url",
           "type": "text",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "altText",
           "columnName": "alt_text",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "sortOrder",
           "columnName": "sort_order",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -1187,13 +1805,16 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "product",
-          "toModel": "Product",
+          "columnName": "product",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Product",
           "fromFields": [
             "productId"
           ],
@@ -1201,12 +1822,15 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         },
         {
           "name": "variant",
-          "toModel": "ProductVariant",
+          "columnName": "variant",
+          "type": "ProductVariant",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "ProductVariant",
           "fromFields": [
             "variantId"
           ],
@@ -1214,8 +1838,7 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -1228,25 +1851,43 @@
         "categoryId"
       ],
       "uniqueConstraints": [],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "productId",
+            "categoryId"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "categoryId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "categoryId",
           "columnName": "category_id",
           "type": "uuid",
-          "nullable": false
-        }
-      ],
-      "relations": [
+          "nullable": false,
+          "isRelation": false
+        },
         {
           "name": "product",
-          "toModel": "Product",
+          "columnName": "product",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Product",
           "fromFields": [
             "productId"
           ],
@@ -1254,12 +1895,15 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         },
         {
           "name": "category",
-          "toModel": "Category",
+          "columnName": "category",
+          "type": "Category",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Category",
           "fromFields": [
             "categoryId"
           ],
@@ -1267,8 +1911,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -1285,13 +1928,34 @@
           "externalProductId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "supplierId",
+            "externalProductId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "productId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1299,50 +1963,58 @@
           "name": "supplierId",
           "columnName": "supplier_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "externalProductId",
           "columnName": "external_product_id",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "supplierUrl",
           "columnName": "supplier_url",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "supplierStatus",
           "columnName": "supplier_status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
           "name": "lastSyncedAt",
           "columnName": "last_synced_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "rawData",
           "columnName": "raw_data",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -1350,13 +2022,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "supplier",
-          "toModel": "Supplier",
+          "columnName": "supplier",
+          "type": "Supplier",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Supplier",
           "fromFields": [
             "supplierId"
           ],
@@ -1364,12 +2039,15 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         },
         {
           "name": "product",
-          "toModel": "Product",
+          "columnName": "product",
+          "type": "Product",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Product",
           "fromFields": [
             "productId"
           ],
@@ -1377,8 +2055,16 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "variants",
+          "columnName": "variants",
+          "type": "SupplierVariant",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierVariant"
         }
       ]
     },
@@ -1395,13 +2081,34 @@
           "externalVariantId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "supplierProductId",
+            "externalVariantId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "productVariantId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1409,25 +2116,29 @@
           "name": "supplierProductId",
           "columnName": "supplier_product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "productVariantId",
           "columnName": "product_variant_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "externalVariantId",
           "columnName": "external_variant_id",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -1435,13 +2146,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "supplierProduct",
-          "toModel": "SupplierProduct",
+          "columnName": "supplierProduct",
+          "type": "SupplierProduct",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierProduct",
           "fromFields": [
             "supplierProductId"
           ],
@@ -1449,12 +2163,15 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         },
         {
           "name": "productVariant",
-          "toModel": "ProductVariant",
+          "columnName": "productVariant",
+          "type": "ProductVariant",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "ProductVariant",
           "fromFields": [
             "productVariantId"
           ],
@@ -1462,8 +2179,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -1480,13 +2196,31 @@
         ]
       ],
       "indexes": [
-        [
-          "storeId",
-          "userId"
-        ],
-        [
-          "expiresAt"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "guestToken"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "storeId",
+            "userId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "expiresAt"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -1494,6 +2228,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1501,45 +2236,52 @@
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "userId",
           "columnName": "user_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "guestToken",
           "columnName": "guest_token",
           "type": "varchar(255)",
           "nullable": true,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "active"
         },
         {
           "name": "expiresAt",
           "columnName": "expires_at",
           "type": "timestamptz",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -1547,10 +2289,19 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
+        },
+        {
+          "name": "items",
+          "columnName": "items",
+          "type": "CartItem",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "CartItem"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "CartItem",
@@ -1565,13 +2316,34 @@
           "variantId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "cartId",
+            "variantId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "variantId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1579,26 +2351,38 @@
           "name": "cartId",
           "columnName": "cart_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "variantId",
           "columnName": "variant_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "quantity",
+          "columnName": "quantity",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "addedAt",
           "columnName": "added_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "cart",
-          "toModel": "Cart",
+          "columnName": "cart",
+          "type": "Cart",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Cart",
           "fromFields": [
             "cartId"
           ],
@@ -1606,8 +2390,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -1628,13 +2411,45 @@
         ]
       ],
       "indexes": [
-        [
-          "storeId",
-          "status"
-        ],
-        [
-          "userId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "idempotencyKey"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "storeId",
+            "orderNumber"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "storeId",
+            "status"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId",
+            "createdAt"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "userId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -1642,6 +2457,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1649,38 +2465,44 @@
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "userId",
           "columnName": "user_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "orderNumber",
           "columnName": "order_number",
           "type": "varchar(50)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "idempotencyKey",
           "columnName": "idempotency_key",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "idempotencyPayloadHash",
           "columnName": "idempotency_payload_hash",
           "type": "varchar(64)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(30)",
           "nullable": false,
+          "isRelation": false,
           "default": "PENDING_PAYMENT"
         },
         {
@@ -1688,25 +2510,29 @@
           "columnName": "payment_status",
           "type": "varchar(30)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "subtotal",
           "columnName": "subtotal",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "shippingTotal",
           "columnName": "shipping_total",
           "type": "decimal(12, 2)",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -1714,6 +2540,7 @@
           "columnName": "tax_total",
           "type": "decimal(12, 2)",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -1721,49 +2548,57 @@
           "columnName": "discount_total",
           "type": "decimal(12, 2)",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
           "name": "grandTotal",
           "columnName": "grand_total",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "customerEmail",
           "columnName": "customer_email",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "customerPhone",
           "columnName": "customer_phone",
           "type": "varchar(50)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "shippingAddressSnapshot",
           "columnName": "shipping_address_snapshot",
           "type": "jsonb",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "billingAddressSnapshot",
           "columnName": "billing_address_snapshot",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "notes",
           "columnName": "notes",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -1771,10 +2606,62 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
+        },
+        {
+          "name": "items",
+          "columnName": "items",
+          "type": "OrderItem",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "OrderItem"
+        },
+        {
+          "name": "payments",
+          "columnName": "payments",
+          "type": "Payment",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Payment"
+        },
+        {
+          "name": "supplierOrder",
+          "columnName": "supplierOrder",
+          "type": "SupplierOrder",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "SupplierOrder"
+        },
+        {
+          "name": "shipment",
+          "columnName": "shipment",
+          "type": "Shipment",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Shipment"
+        },
+        {
+          "name": "invoices",
+          "columnName": "invoices",
+          "type": "Invoice",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Invoice"
+        },
+        {
+          "name": "refunds",
+          "columnName": "refunds",
+          "type": "Refund",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "Refund"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "OrderItem",
@@ -1785,9 +2672,30 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "orderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "productId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "variantId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -1795,6 +2703,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1802,74 +2711,94 @@
           "name": "orderId",
           "columnName": "order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "productId",
           "columnName": "product_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "variantId",
           "columnName": "variant_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "productNameSnapshot",
           "columnName": "product_name_snapshot",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "variantSnapshot",
           "columnName": "variant_snapshot",
           "type": "jsonb",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "quantity",
+          "columnName": "quantity",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "unitSalePrice",
           "columnName": "unit_sale_price",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "unitSupplierCost",
           "columnName": "unit_supplier_cost",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "supplierCurrency",
           "columnName": "supplier_currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "taxRate",
           "columnName": "tax_rate",
           "type": "decimal(5, 4)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -1877,8 +2806,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -1899,9 +2827,37 @@
         ]
       ],
       "indexes": [
-        [
-          "orderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "idempotencyKey"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "provider",
+            "providerPaymentId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -1909,6 +2865,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -1916,81 +2873,94 @@
           "name": "orderId",
           "columnName": "order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "provider",
           "columnName": "provider",
           "type": "varchar(20)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "providerPaymentId",
           "columnName": "provider_payment_id",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "idempotencyKey",
           "columnName": "idempotency_key",
           "type": "varchar(255)",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "amount",
           "columnName": "amount",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "rawResponse",
           "columnName": "raw_response",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "paidAt",
           "columnName": "paid_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "failedAt",
           "columnName": "failed_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "failureReason",
           "columnName": "failure_reason",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -1998,13 +2968,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -2012,8 +2985,7 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2030,13 +3002,34 @@
           "providerEventId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "provider",
+            "providerEventId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "paymentId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2044,54 +3037,68 @@
           "name": "paymentId",
           "columnName": "payment_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "provider",
           "columnName": "provider",
           "type": "varchar(20)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "providerEventId",
           "columnName": "provider_event_id",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "eventType",
           "columnName": "event_type",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "payload",
+          "columnName": "payload",
+          "type": "jsonb",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "processedAt",
           "columnName": "processed_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "processingStatus",
           "columnName": "processing_status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "processingError",
           "columnName": "processing_error",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "WebhookEvent",
@@ -2106,13 +3113,28 @@
           "providerEventId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "provider",
+            "providerEventId"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2120,25 +3142,36 @@
           "name": "provider",
           "columnName": "provider",
           "type": "varchar(20)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "providerEventId",
           "columnName": "provider_event_id",
           "type": "varchar(255)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "eventType",
           "columnName": "event_type",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "payload",
+          "columnName": "payload",
+          "type": "jsonb",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "processed",
           "columnName": "processed",
           "type": "boolean",
           "nullable": false,
+          "isRelation": false,
           "default": false
         },
         {
@@ -2146,29 +3179,32 @@
           "columnName": "processing_status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "processingError",
           "columnName": "processing_error",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "processedAt",
           "columnName": "processed_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "SupplierOrder",
@@ -2187,9 +3223,44 @@
         ]
       ],
       "indexes": [
-        [
-          "orderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "supplierId",
+            "externalOrderId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId",
+            "status"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -2197,6 +3268,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2205,94 +3277,109 @@
           "columnName": "order_id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "supplierId",
           "columnName": "supplier_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "externalOrderId",
           "columnName": "external_order_id",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(30)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "supplierCost",
           "columnName": "supplier_cost",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "supplierShippingCost",
           "columnName": "supplier_shipping_cost",
           "type": "decimal(12, 2)",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "customInvoiceData",
           "columnName": "custom_invoice_data",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "retryCount",
           "columnName": "retry_count",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
           "name": "lastAttemptAt",
           "columnName": "last_attempt_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "lastError",
           "columnName": "last_error",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "submittedAt",
           "columnName": "submitted_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "paidAt",
           "columnName": "paid_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -2300,13 +3387,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -2314,8 +3404,33 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "items",
+          "columnName": "items",
+          "type": "SupplierOrderItem",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierOrderItem"
+        },
+        {
+          "name": "shipment",
+          "columnName": "shipment",
+          "type": "Shipment",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Shipment"
+        },
+        {
+          "name": "supplierRefunds",
+          "columnName": "supplierRefunds",
+          "type": "SupplierRefund",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "SupplierRefund"
         }
       ]
     },
@@ -2328,9 +3443,30 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "supplierOrderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "supplierOrderId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "variantId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "supplierVariantId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -2338,6 +3474,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2345,37 +3482,51 @@
           "name": "supplierOrderId",
           "columnName": "supplier_order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "supplierVariantId",
           "columnName": "supplier_variant_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "variantId",
           "columnName": "variant_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "quantity",
+          "columnName": "quantity",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "unitCost",
           "columnName": "unit_cost",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
-        }
-      ],
-      "relations": [
+          "nullable": false,
+          "isRelation": false
+        },
         {
           "name": "supplierOrder",
-          "toModel": "SupplierOrder",
+          "columnName": "supplierOrder",
+          "type": "SupplierOrder",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrder",
           "fromFields": [
             "supplierOrderId"
           ],
@@ -2383,8 +3534,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2403,13 +3553,46 @@
           "supplierOrderId"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "supplierOrderId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId",
+            "status"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2418,6 +3601,7 @@
           "columnName": "order_id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
@@ -2425,62 +3609,72 @@
           "columnName": "supplier_order_id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "unique": true
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "carrier",
           "columnName": "carrier",
           "type": "varchar(100)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "trackingNumber",
           "columnName": "tracking_number",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "trackingUrl",
           "columnName": "tracking_url",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(30)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "shippedAt",
           "columnName": "shipped_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "deliveredAt",
           "columnName": "delivered_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "lastSyncedAt",
           "columnName": "last_synced_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -2488,13 +3682,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -2502,12 +3699,15 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         },
         {
           "name": "supplierOrder",
-          "toModel": "SupplierOrder",
+          "columnName": "supplierOrder",
+          "type": "SupplierOrder",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrder",
           "fromFields": [
             "supplierOrderId"
           ],
@@ -2515,8 +3715,16 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
+        },
+        {
+          "name": "events",
+          "columnName": "events",
+          "type": "ShipmentEvent",
+          "nullable": false,
+          "isRelation": true,
+          "array": true,
+          "relatesTo": "ShipmentEvent"
         }
       ]
     },
@@ -2534,9 +3742,25 @@
         ]
       ],
       "indexes": [
-        [
-          "shipmentId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "shipmentId",
+            "externalEventId"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "shipmentId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -2544,6 +3768,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2551,50 +3776,59 @@
           "name": "shipmentId",
           "columnName": "shipment_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "externalEventId",
           "columnName": "external_event_id",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(30)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "description",
           "columnName": "description",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "location",
           "columnName": "location",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "occurredAt",
           "columnName": "occurred_at",
           "type": "timestamptz",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "shipment",
-          "toModel": "Shipment",
+          "columnName": "shipment",
+          "type": "Shipment",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Shipment",
           "fromFields": [
             "shipmentId"
           ],
@@ -2602,8 +3836,7 @@
             "id"
           ],
           "onDelete": "Cascade",
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2620,13 +3853,28 @@
           "invoiceNumber"
         ]
       ],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "storeId",
+            "invoiceNumber"
+          ],
+          "type": "unique"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2634,69 +3882,80 @@
           "name": "orderId",
           "columnName": "order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "invoiceNumber",
           "columnName": "invoice_number",
           "type": "varchar(50)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "invoiceType",
           "columnName": "invoice_type",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "sale"
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "subtotal",
           "columnName": "subtotal",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "taxTotal",
           "columnName": "tax_total",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "total",
           "columnName": "total",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "issuedAt",
           "columnName": "issued_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
           "name": "documentUrl",
           "columnName": "document_url",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "issued"
         },
         {
@@ -2704,6 +3963,7 @@
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -2711,13 +3971,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -2725,8 +3988,7 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2739,9 +4001,37 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "orderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "paymentId"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "storeId",
+            "status"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -2749,6 +4039,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2756,62 +4047,72 @@
           "name": "orderId",
           "columnName": "order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "paymentId",
           "columnName": "payment_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "amount",
           "columnName": "amount",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "reason",
           "columnName": "reason",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "providerRefundId",
           "columnName": "provider_refund_id",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "processedAt",
           "columnName": "processed_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -2819,13 +4120,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "order",
-          "toModel": "Order",
+          "columnName": "order",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
           "fromFields": [
             "orderId"
           ],
@@ -2833,8 +4137,7 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2846,13 +4149,27 @@
         "id"
       ],
       "uniqueConstraints": [],
-      "indexes": [],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "supplierId"
+          ],
+          "type": "index"
+        }
+      ],
       "fields": [
         {
           "name": "id",
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2860,50 +4177,58 @@
           "name": "supplierOrderId",
           "columnName": "supplier_order_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "supplierId",
           "columnName": "supplier_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "amount",
           "columnName": "amount",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "pending"
         },
         {
           "name": "externalRefundId",
           "columnName": "external_refund_id",
           "type": "varchar(255)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "reason",
           "columnName": "reason",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
@@ -2911,13 +4236,16 @@
           "columnName": "updated_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "isUpdatedAt": true
-        }
-      ],
-      "relations": [
+        },
         {
           "name": "supplierOrder",
-          "toModel": "SupplierOrder",
+          "columnName": "supplierOrder",
+          "type": "SupplierOrder",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrder",
           "fromFields": [
             "supplierOrderId"
           ],
@@ -2925,8 +4253,7 @@
             "id"
           ],
           "onDelete": null,
-          "onUpdate": null,
-          "isList": false
+          "onUpdate": null
         }
       ]
     },
@@ -2939,13 +4266,25 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "storeId",
-          "transactionType"
-        ],
-        [
-          "orderId"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "storeId",
+            "transactionType"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "orderId"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -2953,6 +4292,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -2960,59 +4300,67 @@
           "name": "storeId",
           "columnName": "store_id",
           "type": "uuid",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "orderId",
           "columnName": "order_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "transactionType",
           "columnName": "transaction_type",
           "type": "varchar(30)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "amount",
           "columnName": "amount",
           "type": "decimal(12, 2)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "currency",
           "columnName": "currency",
           "type": "varchar(3)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "referenceType",
           "columnName": "reference_type",
           "type": "varchar(50)",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "referenceId",
           "columnName": "reference_id",
           "type": "uuid",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "description",
           "columnName": "description",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "BackgroundJob",
@@ -3023,10 +4371,19 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "status",
-          "scheduledAt"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "status",
+            "scheduledAt"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -3034,6 +4391,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -3041,13 +4399,22 @@
           "name": "jobType",
           "columnName": "job_type",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "payload",
+          "columnName": "payload",
+          "type": "jsonb",
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "status",
           "columnName": "status",
           "type": "varchar(20)",
           "nullable": false,
+          "isRelation": false,
           "default": "queued"
         },
         {
@@ -3055,6 +4422,7 @@
           "columnName": "attempts",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 0
         },
         {
@@ -3062,42 +4430,47 @@
           "columnName": "max_attempts",
           "type": "integer",
           "nullable": false,
+          "isRelation": false,
           "default": 3
         },
         {
           "name": "lastError",
           "columnName": "last_error",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "scheduledAt",
           "columnName": "scheduled_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         },
         {
           "name": "startedAt",
           "columnName": "started_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "finishedAt",
           "columnName": "finished_at",
           "type": "timestamptz",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         }
-      ],
-      "relations": []
+      ]
     },
     {
       "name": "IntegrationLog",
@@ -3108,10 +4481,19 @@
       ],
       "uniqueConstraints": [],
       "indexes": [
-        [
-          "integration",
-          "createdAt"
-        ]
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "integration",
+            "createdAt"
+          ],
+          "type": "index"
+        }
       ],
       "fields": [
         {
@@ -3119,6 +4501,7 @@
           "columnName": "id",
           "type": "uuid",
           "nullable": false,
+          "isRelation": false,
           "primaryKey": true,
           "default": "gen_random_uuid()"
         },
@@ -3126,417 +4509,328 @@
           "name": "integration",
           "columnName": "integration",
           "type": "varchar(50)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "operation",
           "columnName": "operation",
           "type": "varchar(100)",
-          "nullable": false
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "requestSummary",
           "columnName": "request_summary",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "responseStatus",
           "columnName": "response_status",
           "type": "integer",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "responseSummary",
           "columnName": "response_summary",
           "type": "jsonb",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "success",
+          "columnName": "success",
+          "type": "boolean",
+          "nullable": false,
+          "isRelation": false
         },
         {
           "name": "errorMessage",
           "columnName": "error_message",
           "type": "text",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "durationMs",
           "columnName": "duration_ms",
           "type": "integer",
-          "nullable": true
+          "nullable": true,
+          "isRelation": false
         },
         {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
           "nullable": false,
+          "isRelation": false,
           "default": "now()"
         }
-      ],
-      "relations": []
+      ]
     }
   ],
   "relations": [
     {
       "from": "StoreSettings",
+      "fromField": "storeId",
       "to": "Store",
+      "toField": "id",
       "type": "1-to-1",
-      "fromFields": [
-        "storeId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "User",
+      "fromField": "storeId",
       "to": "Store",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "storeId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "UserSession",
+      "fromField": "userId",
       "to": "User",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "userId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Address",
+      "fromField": "userId",
       "to": "User",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "userId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "SupplierConnection",
+      "fromField": "supplierId",
       "to": "Supplier",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Category",
+      "fromField": "parentId",
       "to": "Category",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "parentId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "CategoryTranslation",
+      "fromField": "categoryId",
       "to": "Category",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "categoryId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Product",
+      "fromField": "supplierId",
       "to": "Supplier",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "ProductTranslation",
+      "fromField": "productId",
       "to": "Product",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "productId"
-      ],
-      "toFields": [
-        "id"
-      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "ProductVariant",
+      "fromField": "productId",
+      "to": "Product",
+      "toField": "id",
+      "type": "1-to-many",
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "ProductImage",
+      "fromField": "productId",
       "to": "Product",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "productId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "ProductImage",
+      "fromField": "variantId",
       "to": "ProductVariant",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "variantId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "ProductCategory",
+      "fromField": "productId",
       "to": "Product",
+      "toField": "id",
       "type": "junction",
-      "fromFields": [
-        "productId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "ProductCategory",
+      "fromField": "categoryId",
       "to": "Category",
+      "toField": "id",
       "type": "junction",
-      "fromFields": [
-        "categoryId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "SupplierProduct",
+      "fromField": "supplierId",
       "to": "Supplier",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "SupplierProduct",
+      "fromField": "productId",
       "to": "Product",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "productId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "SupplierVariant",
+      "fromField": "supplierProductId",
       "to": "SupplierProduct",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierProductId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "SupplierVariant",
+      "fromField": "productVariantId",
       "to": "ProductVariant",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "productVariantId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "CartItem",
+      "fromField": "cartId",
       "to": "Cart",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "cartId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "OrderItem",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Payment",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "SupplierOrder",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-1",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "SupplierOrderItem",
+      "fromField": "supplierOrderId",
       "to": "SupplierOrder",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierOrderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Shipment",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-1",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "Shipment",
+      "fromField": "supplierOrderId",
       "to": "SupplierOrder",
+      "toField": "id",
       "type": "1-to-1",
-      "fromFields": [
-        "supplierOrderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "ShipmentEvent",
+      "fromField": "shipmentId",
       "to": "Shipment",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "shipmentId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": "Cascade",
       "onUpdate": null
     },
     {
       "from": "Invoice",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "Refund",
+      "fromField": "orderId",
       "to": "Order",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "orderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     },
     {
       "from": "SupplierRefund",
+      "fromField": "supplierOrderId",
       "to": "SupplierOrder",
+      "toField": "id",
       "type": "1-to-many",
-      "fromFields": [
-        "supplierOrderId"
-      ],
-      "toFields": [
-        "id"
-      ],
       "onDelete": null,
       "onUpdate": null
     }
@@ -3565,6 +4859,8 @@
     "sellingPrice = ROUND(supplierCost * exchangeRate * 1.45, 2).",
     "OrderItem snapshots (productNameSnapshot, variantSnapshot, unitSalePrice, unitSupplierCost) are immutable historical values.",
     "Invoices: UNIQUE(store_id, invoice_number).",
-    "Supplier connections tokens encrypted at rest (application-level AES-256-GCM)."
+    "Supplier connections tokens encrypted at rest (application-level AES-256-GCM).",
+    "indexes[] contains ALL index types per model: primary, unique, and regular indexes.",
+    "relations[] contains only FK-bearing sides (child models). fromField is the FK scalar field."
   ]
 }

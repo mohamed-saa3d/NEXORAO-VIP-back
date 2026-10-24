@@ -80,6 +80,7 @@ model UserSession {
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([storeId])
   @@map("user_sessions")
 }
 
@@ -102,6 +103,7 @@ model Address {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, storeId])
+  @@index([storeId])
   @@map("addresses")
 }
 
@@ -153,6 +155,7 @@ model Category {
   translations CategoryTranslation[]
   products     ProductCategory[]
 
+  @@index([parentId])
   @@map("categories")
 }
 
@@ -250,6 +253,7 @@ model ProductImage {
   variant ProductVariant? @relation(fields: [variantId], references: [id])
 
   @@index([productId])
+  @@index([variantId])
   @@map("product_images")
 }
 
@@ -261,6 +265,7 @@ model ProductCategory {
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
+  @@index([categoryId])
   @@map("product_categories")
 }
 
@@ -281,6 +286,7 @@ model SupplierProduct {
   variants SupplierVariant[]
 
   @@unique([supplierId, externalProductId])
+  @@index([productId])
   @@map("supplier_products")
 }
 
@@ -296,6 +302,7 @@ model SupplierVariant {
   productVariant  ProductVariant  @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
 
   @@unique([supplierProductId, externalVariantId])
+  @@index([productVariantId])
   @@map("supplier_variants")
 }
 
@@ -327,6 +334,7 @@ model CartItem {
   cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, variantId])
+  @@index([variantId])
   @@map("cart_items")
 }
 
@@ -362,6 +370,7 @@ model Order {
 
   @@unique([storeId, orderNumber])
   @@index([storeId, status])
+  @@index([storeId, createdAt])
   @@index([userId])
   @@map("orders")
 }
@@ -384,6 +393,8 @@ model OrderItem {
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
   @@map("order_items")
 }
 
@@ -408,6 +419,7 @@ model Payment {
 
   @@unique([provider, providerPaymentId])
   @@index([orderId])
+  @@index([storeId])
   @@map("payments")
 }
 
@@ -424,6 +436,7 @@ model PaymentEvent {
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@unique([provider, providerEventId])
+  @@index([paymentId])
   @@map("payment_events")
 }
 
@@ -469,6 +482,8 @@ model SupplierOrder {
 
   @@unique([supplierId, externalOrderId])
   @@index([orderId])
+  @@index([storeId])
+  @@index([storeId, status])
   @@map("supplier_orders")
 }
 
@@ -484,6 +499,8 @@ model SupplierOrderItem {
   supplierOrder SupplierOrder @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
 
   @@index([supplierOrderId])
+  @@index([variantId])
+  @@index([supplierVariantId])
   @@map("supplier_order_items")
 }
 
@@ -506,6 +523,8 @@ model Shipment {
   supplierOrder SupplierOrder   @relation(fields: [supplierOrderId], references: [id])
   events        ShipmentEvent[]
 
+  @@index([storeId])
+  @@index([storeId, status])
   @@map("shipments")
 }
 
@@ -565,6 +584,9 @@ model Refund {
   order Order @relation(fields: [orderId], references: [id])
 
   @@index([orderId])
+  @@index([storeId])
+  @@index([paymentId])
+  @@index([storeId, status])
   @@map("refunds")
 }
 
@@ -582,6 +604,7 @@ model SupplierRefund {
 
   supplierOrder SupplierOrder @relation(fields: [supplierOrderId], references: [id])
 
+  @@index([supplierId])
   @@map("supplier_refunds")
 }
 

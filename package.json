@@ -15,7 +15,6 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:schema-json": "tsx scripts/generate-schema-json.ts",
     "lint": "eslint src/ prisma/",
     "format": "prettier --write \"src/**/*.ts\""
   },
