@@ -1,0 +1,3570 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-24T18:49:27.330Z",
+    "prismaVersion": "7.10.1",
+    "database": "PostgreSQL 17 (Neon)",
+    "modelCount": 33,
+    "tenantIsolation": "PostgreSQL RLS via app.current_store_id (set_config)"
+  },
+  "stores": [
+    {
+      "code": "NEXORA",
+      "domain": "nexoraonline.de",
+      "currency": "EUR",
+      "defaultLocale": "de"
+    },
+    {
+      "code": "HELPMEY",
+      "domain": "helpmy.de",
+      "currency": "EUR",
+      "defaultLocale": "de"
+    }
+  ],
+  "groups": {
+    "tenancy": [
+      "Store",
+      "StoreSettings"
+    ],
+    "identity": [
+      "User",
+      "UserSession",
+      "Address"
+    ],
+    "supply": [
+      "Supplier",
+      "SupplierConnection"
+    ],
+    "catalog": [
+      "Category",
+      "CategoryTranslation",
+      "Product",
+      "ProductTranslation",
+      "ProductVariant",
+      "ProductImage",
+      "ProductCategory",
+      "SupplierProduct",
+      "SupplierVariant"
+    ],
+    "commerce": [
+      "Cart",
+      "CartItem",
+      "Order",
+      "OrderItem"
+    ],
+    "payment": [
+      "Payment",
+      "PaymentEvent",
+      "WebhookEvent"
+    ],
+    "fulfillment": [
+      "SupplierOrder",
+      "SupplierOrderItem",
+      "Shipment",
+      "ShipmentEvent"
+    ],
+    "finance": [
+      "Invoice",
+      "Refund",
+      "SupplierRefund",
+      "FinancialTransaction"
+    ],
+    "ops": [
+      "BackgroundJob",
+      "IntegrationLog"
+    ]
+  },
+  "models": [
+    {
+      "name": "Store",
+      "table": "stores",
+      "group": "tenancy",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "code"
+        ],
+        [
+          "domain"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "code",
+          "columnName": "code",
+          "type": "varchar(50)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "name",
+          "columnName": "name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "domain",
+          "columnName": "domain",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "defaultLocale",
+          "columnName": "default_locale",
+          "type": "varchar(5)",
+          "nullable": false,
+          "default": "ar"
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false,
+          "default": "EUR"
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "version",
+          "columnName": "version",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "StoreSettings",
+      "table": "store_settings",
+      "group": "tenancy",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "storeId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "invoicePrefix",
+          "columnName": "invoice_prefix",
+          "type": "varchar(20)",
+          "nullable": false
+        },
+        {
+          "name": "nextInvoiceNumber",
+          "columnName": "next_invoice_number",
+          "type": "bigint",
+          "nullable": false,
+          "default": 1
+        },
+        {
+          "name": "vatRate",
+          "columnName": "vat_rate",
+          "type": "decimal(5, 4)",
+          "nullable": false,
+          "default": 0.19
+        },
+        {
+          "name": "vatIncludedInPrice",
+          "columnName": "vat_included_in_price",
+          "type": "boolean",
+          "nullable": false,
+          "default": true
+        },
+        {
+          "name": "markupPercentage",
+          "columnName": "markup_percentage",
+          "type": "decimal(5, 2)",
+          "nullable": false,
+          "default": 45
+        },
+        {
+          "name": "allowedLocales",
+          "columnName": "allowed_locales",
+          "type": "text[]",
+          "nullable": true,
+          "array": true,
+          "default": [
+            "ar",
+            "en",
+            "de"
+          ]
+        },
+        {
+          "name": "refundWindowDays",
+          "columnName": "refund_window_days",
+          "type": "integer",
+          "nullable": false,
+          "default": 14
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "store",
+          "toModel": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "table": "users",
+      "group": "identity",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "storeId",
+          "email"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "email",
+          "columnName": "email",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "passwordHash",
+          "columnName": "password_hash",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "columnName": "name",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "phone",
+          "columnName": "phone",
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        {
+          "name": "role",
+          "columnName": "role",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "customer"
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "emailVerifiedAt",
+          "columnName": "email_verified_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "tokenVersion",
+          "columnName": "token_version",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "store",
+          "toModel": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "UserSession",
+      "table": "user_sessions",
+      "group": "identity",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "refreshTokenHash"
+        ]
+      ],
+      "indexes": [
+        [
+          "userId"
+        ],
+        [
+          "expiresAt"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "userId",
+          "columnName": "user_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "refreshTokenHash",
+          "columnName": "refresh_token_hash",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "userAgent",
+          "columnName": "user_agent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "ipAddress",
+          "columnName": "ip_address",
+          "type": "varchar(45)",
+          "nullable": true
+        },
+        {
+          "name": "expiresAt",
+          "columnName": "expires_at",
+          "type": "timestamptz",
+          "nullable": false
+        },
+        {
+          "name": "revokedAt",
+          "columnName": "revoked_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": [
+        {
+          "name": "user",
+          "toModel": "User",
+          "fromFields": [
+            "userId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Address",
+      "table": "addresses",
+      "group": "identity",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "userId",
+          "storeId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "userId",
+          "columnName": "user_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "recipientName",
+          "columnName": "recipient_name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "phone",
+          "columnName": "phone",
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        {
+          "name": "countryCode",
+          "columnName": "country_code",
+          "type": "varchar(2)",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "columnName": "city",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "postalCode",
+          "columnName": "postal_code",
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        {
+          "name": "addressLine1",
+          "columnName": "address_line1",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "addressLine2",
+          "columnName": "address_line2",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "isDefault",
+          "columnName": "is_default",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        },
+        {
+          "name": "deletedAt",
+          "columnName": "deleted_at",
+          "type": "timestamptz",
+          "nullable": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "user",
+          "toModel": "User",
+          "fromFields": [
+            "userId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Supplier",
+      "table": "suppliers",
+      "group": "supply",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "code"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "code",
+          "columnName": "code",
+          "type": "varchar(50)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "name",
+          "columnName": "name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "SupplierConnection",
+      "table": "supplier_connections",
+      "group": "supply",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "supplierId",
+          "storeId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierId",
+          "columnName": "supplier_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "disconnected"
+        },
+        {
+          "name": "accessTokenEncrypted",
+          "columnName": "access_token_encrypted",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "refreshTokenEncrypted",
+          "columnName": "refresh_token_encrypted",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "tokenExpiresAt",
+          "columnName": "token_expires_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "lastVerifiedAt",
+          "columnName": "last_verified_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "lastError",
+          "columnName": "last_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplier",
+          "toModel": "Supplier",
+          "fromFields": [
+            "supplierId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "table": "categories",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "slug"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "parentId",
+          "columnName": "parent_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "slug",
+          "columnName": "slug",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "sortOrder",
+          "columnName": "sort_order",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "parent",
+          "toModel": "Category",
+          "fromFields": [
+            "parentId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "CategoryTranslation",
+      "table": "category_translations",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "categoryId",
+          "locale"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "categoryId",
+          "columnName": "category_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "locale",
+          "columnName": "locale",
+          "type": "varchar(5)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "columnName": "name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "category",
+          "toModel": "Category",
+          "fromFields": [
+            "categoryId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "table": "products",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "slug"
+        ]
+      ],
+      "indexes": [
+        [
+          "supplierId"
+        ],
+        [
+          "status"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierId",
+          "columnName": "supplier_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "slug",
+          "columnName": "slug",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "brand",
+          "columnName": "brand",
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "createdBy",
+          "columnName": "created_by",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "lastSyncedAt",
+          "columnName": "last_synced_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplier",
+          "toModel": "Supplier",
+          "fromFields": [
+            "supplierId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "ProductTranslation",
+      "table": "product_translations",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "productId",
+          "locale"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "locale",
+          "columnName": "locale",
+          "type": "varchar(5)",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "columnName": "name",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "seoTitle",
+          "columnName": "seo_title",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "seoDescription",
+          "columnName": "seo_description",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "product",
+          "toModel": "Product",
+          "fromFields": [
+            "productId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "ProductVariant",
+      "table": "productvariant",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "sku"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "sku",
+          "columnName": "sku",
+          "type": "varchar(100)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "attributes",
+          "columnName": "attributes",
+          "type": "jsonb",
+          "nullable": false
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "ProductImage",
+      "table": "product_images",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "productId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "variantId",
+          "columnName": "variant_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "url",
+          "columnName": "url",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "altText",
+          "columnName": "alt_text",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "sortOrder",
+          "columnName": "sort_order",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": [
+        {
+          "name": "product",
+          "toModel": "Product",
+          "fromFields": [
+            "productId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        },
+        {
+          "name": "variant",
+          "toModel": "ProductVariant",
+          "fromFields": [
+            "variantId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "ProductCategory",
+      "table": "product_categories",
+      "group": "catalog",
+      "primaryKey": [
+        "productId",
+        "categoryId"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "categoryId",
+          "columnName": "category_id",
+          "type": "uuid",
+          "nullable": false
+        }
+      ],
+      "relations": [
+        {
+          "name": "product",
+          "toModel": "Product",
+          "fromFields": [
+            "productId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        },
+        {
+          "name": "category",
+          "toModel": "Category",
+          "fromFields": [
+            "categoryId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "SupplierProduct",
+      "table": "supplier_products",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "supplierId",
+          "externalProductId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierId",
+          "columnName": "supplier_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "externalProductId",
+          "columnName": "external_product_id",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "supplierUrl",
+          "columnName": "supplier_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "supplierStatus",
+          "columnName": "supplier_status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "lastSyncedAt",
+          "columnName": "last_synced_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "rawData",
+          "columnName": "raw_data",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplier",
+          "toModel": "Supplier",
+          "fromFields": [
+            "supplierId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        },
+        {
+          "name": "product",
+          "toModel": "Product",
+          "fromFields": [
+            "productId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "SupplierVariant",
+      "table": "supplier_variants",
+      "group": "catalog",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "supplierProductId",
+          "externalVariantId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierProductId",
+          "columnName": "supplier_product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "productVariantId",
+          "columnName": "product_variant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "externalVariantId",
+          "columnName": "external_variant_id",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplierProduct",
+          "toModel": "SupplierProduct",
+          "fromFields": [
+            "supplierProductId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        },
+        {
+          "name": "productVariant",
+          "toModel": "ProductVariant",
+          "fromFields": [
+            "productVariantId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "table": "carts",
+      "group": "commerce",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "guestToken"
+        ]
+      ],
+      "indexes": [
+        [
+          "storeId",
+          "userId"
+        ],
+        [
+          "expiresAt"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "columnName": "user_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "guestToken",
+          "columnName": "guest_token",
+          "type": "varchar(255)",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "active"
+        },
+        {
+          "name": "expiresAt",
+          "columnName": "expires_at",
+          "type": "timestamptz",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "CartItem",
+      "table": "cart_items",
+      "group": "commerce",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "cartId",
+          "variantId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "cartId",
+          "columnName": "cart_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "variantId",
+          "columnName": "variant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "addedAt",
+          "columnName": "added_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": [
+        {
+          "name": "cart",
+          "toModel": "Cart",
+          "fromFields": [
+            "cartId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "table": "orders",
+      "group": "commerce",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "idempotencyKey"
+        ],
+        [
+          "storeId",
+          "orderNumber"
+        ]
+      ],
+      "indexes": [
+        [
+          "storeId",
+          "status"
+        ],
+        [
+          "userId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "userId",
+          "columnName": "user_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "orderNumber",
+          "columnName": "order_number",
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        {
+          "name": "idempotencyKey",
+          "columnName": "idempotency_key",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "idempotencyPayloadHash",
+          "columnName": "idempotency_payload_hash",
+          "type": "varchar(64)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(30)",
+          "nullable": false,
+          "default": "PENDING_PAYMENT"
+        },
+        {
+          "name": "paymentStatus",
+          "columnName": "payment_status",
+          "type": "varchar(30)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "subtotal",
+          "columnName": "subtotal",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "shippingTotal",
+          "columnName": "shipping_total",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "taxTotal",
+          "columnName": "tax_total",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "discountTotal",
+          "columnName": "discount_total",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "grandTotal",
+          "columnName": "grand_total",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "customerEmail",
+          "columnName": "customer_email",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "customerPhone",
+          "columnName": "customer_phone",
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        {
+          "name": "shippingAddressSnapshot",
+          "columnName": "shipping_address_snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "billingAddressSnapshot",
+          "columnName": "billing_address_snapshot",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "columnName": "notes",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "OrderItem",
+      "table": "order_items",
+      "group": "commerce",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "orderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "productId",
+          "columnName": "product_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "variantId",
+          "columnName": "variant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "productNameSnapshot",
+          "columnName": "product_name_snapshot",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "variantSnapshot",
+          "columnName": "variant_snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "unitSalePrice",
+          "columnName": "unit_sale_price",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "unitSupplierCost",
+          "columnName": "unit_supplier_cost",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "supplierCurrency",
+          "columnName": "supplier_currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "taxRate",
+          "columnName": "tax_rate",
+          "type": "decimal(5, 4)",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "table": "payments",
+      "group": "payment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "idempotencyKey"
+        ],
+        [
+          "provider",
+          "providerPaymentId"
+        ]
+      ],
+      "indexes": [
+        [
+          "orderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "provider",
+          "columnName": "provider",
+          "type": "varchar(20)",
+          "nullable": false
+        },
+        {
+          "name": "providerPaymentId",
+          "columnName": "provider_payment_id",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "idempotencyKey",
+          "columnName": "idempotency_key",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "amount",
+          "columnName": "amount",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "rawResponse",
+          "columnName": "raw_response",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "paidAt",
+          "columnName": "paid_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "failedAt",
+          "columnName": "failed_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "failureReason",
+          "columnName": "failure_reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "PaymentEvent",
+      "table": "payment_events",
+      "group": "payment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "provider",
+          "providerEventId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "paymentId",
+          "columnName": "payment_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "provider",
+          "columnName": "provider",
+          "type": "varchar(20)",
+          "nullable": false
+        },
+        {
+          "name": "providerEventId",
+          "columnName": "provider_event_id",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "eventType",
+          "columnName": "event_type",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "processedAt",
+          "columnName": "processed_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "processingStatus",
+          "columnName": "processing_status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "processingError",
+          "columnName": "processing_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "WebhookEvent",
+      "table": "webhook_events",
+      "group": "payment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "provider",
+          "providerEventId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "provider",
+          "columnName": "provider",
+          "type": "varchar(20)",
+          "nullable": false
+        },
+        {
+          "name": "providerEventId",
+          "columnName": "provider_event_id",
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        {
+          "name": "eventType",
+          "columnName": "event_type",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "processed",
+          "columnName": "processed",
+          "type": "boolean",
+          "nullable": false,
+          "default": false
+        },
+        {
+          "name": "processingStatus",
+          "columnName": "processing_status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "processingError",
+          "columnName": "processing_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "processedAt",
+          "columnName": "processed_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "SupplierOrder",
+      "table": "supplier_orders",
+      "group": "fulfillment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "orderId"
+        ],
+        [
+          "supplierId",
+          "externalOrderId"
+        ]
+      ],
+      "indexes": [
+        [
+          "orderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "supplierId",
+          "columnName": "supplier_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "externalOrderId",
+          "columnName": "external_order_id",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(30)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "supplierCost",
+          "columnName": "supplier_cost",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "supplierShippingCost",
+          "columnName": "supplier_shipping_cost",
+          "type": "decimal(12, 2)",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "customInvoiceData",
+          "columnName": "custom_invoice_data",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "retryCount",
+          "columnName": "retry_count",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "lastAttemptAt",
+          "columnName": "last_attempt_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "lastError",
+          "columnName": "last_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "submittedAt",
+          "columnName": "submitted_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "paidAt",
+          "columnName": "paid_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "SupplierOrderItem",
+      "table": "supplier_order_items",
+      "group": "fulfillment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "supplierOrderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierOrderId",
+          "columnName": "supplier_order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "supplierVariantId",
+          "columnName": "supplier_variant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "variantId",
+          "columnName": "variant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "unitCost",
+          "columnName": "unit_cost",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplierOrder",
+          "toModel": "SupplierOrder",
+          "fromFields": [
+            "supplierOrderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Shipment",
+      "table": "shipments",
+      "group": "fulfillment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "orderId"
+        ],
+        [
+          "supplierOrderId"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "supplierOrderId",
+          "columnName": "supplier_order_id",
+          "type": "uuid",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "carrier",
+          "columnName": "carrier",
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        {
+          "name": "trackingNumber",
+          "columnName": "tracking_number",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "trackingUrl",
+          "columnName": "tracking_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(30)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "shippedAt",
+          "columnName": "shipped_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "deliveredAt",
+          "columnName": "delivered_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "lastSyncedAt",
+          "columnName": "last_synced_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        },
+        {
+          "name": "supplierOrder",
+          "toModel": "SupplierOrder",
+          "fromFields": [
+            "supplierOrderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentEvent",
+      "table": "shipment_events",
+      "group": "fulfillment",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "shipmentId",
+          "externalEventId"
+        ]
+      ],
+      "indexes": [
+        [
+          "shipmentId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "shipmentId",
+          "columnName": "shipment_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "externalEventId",
+          "columnName": "external_event_id",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(30)",
+          "nullable": false
+        },
+        {
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "location",
+          "columnName": "location",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "occurredAt",
+          "columnName": "occurred_at",
+          "type": "timestamptz",
+          "nullable": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": [
+        {
+          "name": "shipment",
+          "toModel": "Shipment",
+          "fromFields": [
+            "shipmentId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Invoice",
+      "table": "invoices",
+      "group": "finance",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "storeId",
+          "invoiceNumber"
+        ]
+      ],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "invoiceNumber",
+          "columnName": "invoice_number",
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        {
+          "name": "invoiceType",
+          "columnName": "invoice_type",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "sale"
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "subtotal",
+          "columnName": "subtotal",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "taxTotal",
+          "columnName": "tax_total",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "total",
+          "columnName": "total",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "issuedAt",
+          "columnName": "issued_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "documentUrl",
+          "columnName": "document_url",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "issued"
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "Refund",
+      "table": "refunds",
+      "group": "finance",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "orderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "paymentId",
+          "columnName": "payment_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "amount",
+          "columnName": "amount",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "columnName": "reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "providerRefundId",
+          "columnName": "provider_refund_id",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "processedAt",
+          "columnName": "processed_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "order",
+          "toModel": "Order",
+          "fromFields": [
+            "orderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "SupplierRefund",
+      "table": "supplier_refunds",
+      "group": "finance",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "supplierOrderId",
+          "columnName": "supplier_order_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "supplierId",
+          "columnName": "supplier_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "amount",
+          "columnName": "amount",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "externalRefundId",
+          "columnName": "external_refund_id",
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        {
+          "name": "reason",
+          "columnName": "reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isUpdatedAt": true
+        }
+      ],
+      "relations": [
+        {
+          "name": "supplierOrder",
+          "toModel": "SupplierOrder",
+          "fromFields": [
+            "supplierOrderId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": null,
+          "onUpdate": null,
+          "isList": false
+        }
+      ]
+    },
+    {
+      "name": "FinancialTransaction",
+      "table": "financial_transactions",
+      "group": "finance",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "storeId",
+          "transactionType"
+        ],
+        [
+          "orderId"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "storeId",
+          "columnName": "store_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "orderId",
+          "columnName": "order_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "transactionType",
+          "columnName": "transaction_type",
+          "type": "varchar(30)",
+          "nullable": false
+        },
+        {
+          "name": "amount",
+          "columnName": "amount",
+          "type": "decimal(12, 2)",
+          "nullable": false
+        },
+        {
+          "name": "currency",
+          "columnName": "currency",
+          "type": "varchar(3)",
+          "nullable": false
+        },
+        {
+          "name": "referenceType",
+          "columnName": "reference_type",
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        {
+          "name": "referenceId",
+          "columnName": "reference_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "description",
+          "columnName": "description",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "BackgroundJob",
+      "table": "background_jobs",
+      "group": "ops",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "status",
+          "scheduledAt"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "jobType",
+          "columnName": "job_type",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "columnName": "status",
+          "type": "varchar(20)",
+          "nullable": false,
+          "default": "queued"
+        },
+        {
+          "name": "attempts",
+          "columnName": "attempts",
+          "type": "integer",
+          "nullable": false,
+          "default": 0
+        },
+        {
+          "name": "maxAttempts",
+          "columnName": "max_attempts",
+          "type": "integer",
+          "nullable": false,
+          "default": 3
+        },
+        {
+          "name": "lastError",
+          "columnName": "last_error",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "scheduledAt",
+          "columnName": "scheduled_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "startedAt",
+          "columnName": "started_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "finishedAt",
+          "columnName": "finished_at",
+          "type": "timestamptz",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "IntegrationLog",
+      "table": "integration_logs",
+      "group": "ops",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [],
+      "indexes": [
+        [
+          "integration",
+          "createdAt"
+        ]
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "integration",
+          "columnName": "integration",
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        {
+          "name": "operation",
+          "columnName": "operation",
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        {
+          "name": "requestSummary",
+          "columnName": "request_summary",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "responseStatus",
+          "columnName": "response_status",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "responseSummary",
+          "columnName": "response_summary",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "errorMessage",
+          "columnName": "error_message",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "durationMs",
+          "columnName": "duration_ms",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "relations": [
+    {
+      "from": "StoreSettings",
+      "to": "Store",
+      "type": "1-to-1",
+      "fromFields": [
+        "storeId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "User",
+      "to": "Store",
+      "type": "1-to-many",
+      "fromFields": [
+        "storeId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "UserSession",
+      "to": "User",
+      "type": "1-to-many",
+      "fromFields": [
+        "userId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Address",
+      "to": "User",
+      "type": "1-to-many",
+      "fromFields": [
+        "userId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierConnection",
+      "to": "Supplier",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Category",
+      "to": "Category",
+      "type": "1-to-many",
+      "fromFields": [
+        "parentId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "CategoryTranslation",
+      "to": "Category",
+      "type": "1-to-many",
+      "fromFields": [
+        "categoryId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Product",
+      "to": "Supplier",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "ProductTranslation",
+      "to": "Product",
+      "type": "1-to-many",
+      "fromFields": [
+        "productId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "ProductImage",
+      "to": "Product",
+      "type": "1-to-many",
+      "fromFields": [
+        "productId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "ProductImage",
+      "to": "ProductVariant",
+      "type": "1-to-many",
+      "fromFields": [
+        "variantId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "ProductCategory",
+      "to": "Product",
+      "type": "junction",
+      "fromFields": [
+        "productId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "ProductCategory",
+      "to": "Category",
+      "type": "junction",
+      "fromFields": [
+        "categoryId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierProduct",
+      "to": "Supplier",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierProduct",
+      "to": "Product",
+      "type": "1-to-many",
+      "fromFields": [
+        "productId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierVariant",
+      "to": "SupplierProduct",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierProductId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierVariant",
+      "to": "ProductVariant",
+      "type": "1-to-many",
+      "fromFields": [
+        "productVariantId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "CartItem",
+      "to": "Cart",
+      "type": "1-to-many",
+      "fromFields": [
+        "cartId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "OrderItem",
+      "to": "Order",
+      "type": "1-to-many",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Payment",
+      "to": "Order",
+      "type": "1-to-many",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierOrder",
+      "to": "Order",
+      "type": "1-to-1",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierOrderItem",
+      "to": "SupplierOrder",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierOrderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Shipment",
+      "to": "Order",
+      "type": "1-to-1",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "Shipment",
+      "to": "SupplierOrder",
+      "type": "1-to-1",
+      "fromFields": [
+        "supplierOrderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "ShipmentEvent",
+      "to": "Shipment",
+      "type": "1-to-many",
+      "fromFields": [
+        "shipmentId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Invoice",
+      "to": "Order",
+      "type": "1-to-many",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "Refund",
+      "to": "Order",
+      "type": "1-to-many",
+      "fromFields": [
+        "orderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierRefund",
+      "to": "SupplierOrder",
+      "type": "1-to-many",
+      "fromFields": [
+        "supplierOrderId"
+      ],
+      "toFields": [
+        "id"
+      ],
+      "onDelete": null,
+      "onUpdate": null
+    }
+  ],
+  "rlsProtectedTables": [
+    "orders",
+    "order_items",
+    "payments",
+    "payment_events",
+    "refunds",
+    "invoices",
+    "shipments",
+    "shipment_events",
+    "supplier_orders",
+    "supplier_order_items",
+    "carts",
+    "cart_items",
+    "addresses",
+    "user_sessions",
+    "users",
+    "financial_transactions"
+  ],
+  "notes": [
+    "All monetary amounts use DECIMAL(12,2).",
+    "All IDs are UUID via gen_random_uuid() (PostgreSQL 13+).",
+    "sellingPrice = ROUND(supplierCost * exchangeRate * 1.45, 2).",
+    "OrderItem snapshots (productNameSnapshot, variantSnapshot, unitSalePrice, unitSupplierCost) are immutable historical values.",
+    "Invoices: UNIQUE(store_id, invoice_number).",
+    "Supplier connections tokens encrypted at rest (application-level AES-256-GCM)."
+  ]
+}
