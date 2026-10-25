@@ -428,3 +428,32 @@ regenerated, schema and build clean.
 ### Next phase
 Phase D — Auth module.
 Uncommitted: `prisma/migrations/` (new). No other changes.
+
+---
+
+## SCHEMA REFINEMENTS
+
+Date: 2026-10-25
+
+### Commit 1 — remove_vat_fields (20261025190000)
+
+Removed
+- `StoreSettings.vatRate` (was `0.19`)
+- `StoreSettings.vatIncludedInPrice` (was `true`)
+
+Rationale: 45% markup is final price including tax. VAT compliance deferred.
+
+Migration SQL (complete content):
+```sql
+-- AlterTable
+ALTER TABLE "store_settings" DROP COLUMN "vat_included_in_price",
+DROP COLUMN "vat_rate";
+```
+
+> Migration created via `prisma migrate diff --from-config-datasource --to-schema`
+> because `prisma migrate dev --create-only` refuses to run in this non-interactive
+> shell. The first `deploy` attempt failed with `42601` (UTF-8 BOM prepended by
+> PowerShell's `Set-Content`); the file was rewritten without BOM, the failed record
+> marked with `prisma migrate resolve --rolled-back`, and `deploy` then succeeded.
+
+Verification: `pnpm prisma validate` 0 · `pnpm build` 0 · `pnpm test` 3/3

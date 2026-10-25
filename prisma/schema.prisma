@@ -43,9 +43,9 @@ model StoreSettings {
   storeId            String   @unique @map("store_id") @db.Uuid
   invoicePrefix      String   @map("invoice_prefix") @db.VarChar(20)
   nextInvoiceNumber  BigInt   @default(1) @map("next_invoice_number")
-  vatRate            Decimal  @default(0.19) @map("vat_rate") @db.Decimal(5, 4)
-  vatIncludedInPrice Boolean  @default(true) @map("vat_included_in_price")
   markupPercentage   Decimal  @default(45.00) @map("markup_percentage") @db.Decimal(5, 2)
+  /// VAT is not stored per-store. Prices are final (markup 45% includes any applicable tax).
+  /// If German VAT compliance is later required, re-add vatRate + vatIncludedInPrice.
   allowedLocales     String[] @default(["ar", "en", "de"]) @map("allowed_locales")
   refundWindowDays   Int      @default(14) @map("refund_window_days")
   createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
