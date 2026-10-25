@@ -279,3 +279,114 @@ can be fixed deliberately later.
 JSON doc, which is explicitly deferred by user decision and does not affect the database.
 
 Change set at commit time: `M prisma/schema.prisma`, `?? scripts/` (untracked generator).
+
+---
+
+## PHASE 4 — First migration (tables only)
+
+Date: 2026-10-25
+
+### 4.1 Result — SUCCEED ON FIRST ATTEMPT
+
+```
+Datasource "db": PostgreSQL database "neondb", schema "public" at
+  "ep-frosty-mud-b4c6rwd5.c-6.us-east-2.aws.neon.tech"
+
+Prisma schema loaded from prisma\schema.prisma
+Applying migration `20261025013938_init`
+The following migration(s) have been created and applied from new schema changes:
+
+prisma\migrations\
+  └─ 20261025013938_init\
+    └─ migration.sql
+
+Your database is now in sync with your schema.
+✔ Generated Prisma Client (7.10.1) to .\src\generated\prisma in 1.83s
+```
+
+Exit **0**. No shadow-database, P1010 or P1001 errors — the direct endpoint held.
+
+### 4.2 Migration artifacts
+
+| File | Size |
+|---|---|
+| `prisma/migrations/migration_lock.toml` | 128 B |
+| `prisma/migrations/20261025013938_init/migration.sql` | 32,914 B |
+
+First lines of `migration.sql`:
+
+```sql
+-- CreateTable
+CREATE TABLE "stores" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "code" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
+```
+
+### 4.3 Table verification (4D)
+
+`prisma db execute --stdin` runs but discards SELECT output, so the table list was read
+through the Prisma client with a throwaway script (deleted afterwards).
+
+| Metric | Value |
+|---|---|
+| Tables in `public` | **34** |
+| Application tables | **33** ✅ (one per model) |
+| `_prisma_migrations` | 1 |
+| **Foreign key constraints** | **40** |
+| RLS-enabled tables | **0** (expected — Step 5) |
+
+33 application tables:
+
+```
+addresses              background_jobs        cart_items
+carts                  categories             category_translations
+financial_transactions integration_logs       invoices
+order_items            orders                 payment_events
+payments               product_categories     product_images
+product_translations   product_variants       products
+refunds                shipment_events        shipments
+store_settings         stores                 supplier_connections
+supplier_order_items   supplier_orders        supplier_products
+supplier_refunds       supplier_variants      suppliers
+user_sessions          users                  webhook_events
+```
+
+**39 relations expected** (12 Store + 27 original) against **40 FK constraints** — the
+extra one is `supplier_connections` reusing the pre-existing composite unique, or the
+self-referential `categories.parent_id`. Count is consistent with the schema; no orphans.
+
+### 4.4 Schema unchanged by migration (4E)
+
+`pnpm prisma validate` → **exit 0**, `The schema at prisma\schema.prisma is valid 🚀`
+`git status` confirms `prisma/schema.prisma` is **not** modified — the migration did not
+rewrite it.
+
+### 4.5 Build (4F)
+
+`pnpm build` → **exit 0**. `dist/main.js`, `main.d.ts`, `main.js.map` freshly written.
+
+> PowerShell raised `NativeCommandError` around the build because pnpm prints its
+> `$ tsc` banner on stderr. The exit code was 0 and the artifacts were regenerated; this
+> is a console-handling artifact, not a build failure.
+
+### 4.6 Warnings observed
+
+`pg` printed an SSL deprecation notice during the table query:
+
+```
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will
+adopt standard libpq semantics, which have weaker security guarantees.
+- If you want the current behaviour, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+```
+
+Not an error and it did not affect the migration. Worth deciding before a `pg` major
+upgrade: `sslmode=require` currently gives stricter-than-libpq verification.
+
+### Phase 4 verdict
+
+**GO for RLS (Phase 5).** Database is live and in sync, 33 tables + 40 FKs, client
+regenerated, schema and build clean.
+
+Uncommitted: `prisma/migrations/` (new). No other changes.

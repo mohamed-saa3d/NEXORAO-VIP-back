@@ -1,9 +1,11 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client.js';
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL_APP;
 if (!connectionString) {
-  throw new Error('DATABASE_URL must be set before initializing PrismaClient.');
+  throw new Error(
+    'DATABASE_URL_APP must be set (owner role has BYPASSRLS — cannot be used at runtime).'
+  );
 }
 
 const adapter = new PrismaPg({ connectionString });
