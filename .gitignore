@@ -21,3 +21,8 @@ out.txt
 output.txt
 stdout.txt
 src_output.*
+
+# Agent tooling (personal, not project)
+.kilo/
+.agents/
+skills-lock.json
