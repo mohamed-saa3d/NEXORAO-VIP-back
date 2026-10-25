@@ -22,6 +22,19 @@ model Store {
   settings StoreSettings?
   users    User[]
 
+  // Back-relations for tenant-scoped entities (FKs added with onDelete: Restrict).
+  orders                Order[]
+  payments              Payment[]
+  refunds               Refund[]
+  invoices              Invoice[]
+  shipments             Shipment[]
+  supplierOrders        SupplierOrder[]
+  carts                 Cart[]
+  addresses             Address[]
+  financialTransactions FinancialTransaction[]
+  userSessions          UserSession[]
+  supplierConnections   SupplierConnection[]
+
   @@map("stores")
 }
 
@@ -57,7 +70,7 @@ model User {
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  store     Store?        @relation(fields: [storeId], references: [id])
+  store     Store?        @relation(fields: [storeId], references: [id], onDelete: Restrict)
   sessions  UserSession[]
   addresses Address[]
 
@@ -76,7 +89,8 @@ model UserSession {
   revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store Store? @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([userId])
   @@index([expiresAt])
@@ -100,7 +114,8 @@ model Address {
   updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(6)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([userId, storeId])
   @@index([storeId])
@@ -136,6 +151,7 @@ model SupplierConnection {
   updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  store    Store?   @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@unique([supplierId, storeId])
   @@map("supplier_connections")
@@ -318,6 +334,7 @@ model Cart {
   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   items CartItem[]
+  store Store      @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([storeId, userId])
   @@index([expiresAt])
@@ -339,27 +356,31 @@ model CartItem {
 }
 
 model Order {
-  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  storeId                 String   @map("store_id") @db.Uuid
-  userId                  String?  @map("user_id") @db.Uuid
-  orderNumber             String   @map("order_number") @db.VarChar(50)
-  idempotencyKey          String   @unique @map("idempotency_key") @db.VarChar(255)
-  idempotencyPayloadHash  String   @map("idempotency_payload_hash") @db.VarChar(64)
-  status                  String   @default("PENDING_PAYMENT") @db.VarChar(30)
-  paymentStatus           String   @default("pending") @map("payment_status") @db.VarChar(30)
-  currency                String   @db.VarChar(3)
-  subtotal                Decimal  @db.Decimal(12, 2)
-  shippingTotal           Decimal  @default(0) @map("shipping_total") @db.Decimal(12, 2)
-  taxTotal                Decimal  @default(0) @map("tax_total") @db.Decimal(12, 2)
-  discountTotal           Decimal  @default(0) @map("discount_total") @db.Decimal(12, 2)
-  grandTotal              Decimal  @map("grand_total") @db.Decimal(12, 2)
-  customerEmail           String   @map("customer_email") @db.VarChar(255)
-  customerPhone           String?  @map("customer_phone") @db.VarChar(50)
-  shippingAddressSnapshot Json     @map("shipping_address_snapshot")
-  billingAddressSnapshot  Json?    @map("billing_address_snapshot")
-  notes                   String?  @db.Text
-  createdAt               DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt               DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  storeId                 String    @map("store_id") @db.Uuid
+  userId                  String?   @map("user_id") @db.Uuid
+  orderNumber             String    @map("order_number") @db.VarChar(50)
+  idempotencyKey          String    @unique @map("idempotency_key") @db.VarChar(255)
+  idempotencyPayloadHash  String    @map("idempotency_payload_hash") @db.VarChar(64)
+  status                  String    @default("PENDING_PAYMENT") @db.VarChar(30)
+  paymentStatus           String    @default("pending") @map("payment_status") @db.VarChar(30)
+  currency                String    @db.VarChar(3)
+  subtotal                Decimal   @db.Decimal(12, 2)
+  shippingTotal           Decimal   @default(0) @map("shipping_total") @db.Decimal(12, 2)
+  taxTotal                Decimal   @default(0) @map("tax_total") @db.Decimal(12, 2)
+  discountTotal           Decimal   @default(0) @map("discount_total") @db.Decimal(12, 2)
+  grandTotal              Decimal   @map("grand_total") @db.Decimal(12, 2)
+  customerEmail           String    @map("customer_email") @db.VarChar(255)
+  customerPhone           String?   @map("customer_phone") @db.VarChar(50)
+  shippingAddressSnapshot Json      @map("shipping_address_snapshot")
+  billingAddressSnapshot  Json?     @map("billing_address_snapshot")
+  notes                   String?   @db.Text
+  cancelledAt             DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  cancelReason            String?   @map("cancel_reason") @db.Text
+  cancelledBy             String?   @map("cancelled_by") @db.Uuid
+  policySnapshot          Json?     @map("policy_snapshot")
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   items         OrderItem[]
   payments      Payment[]
@@ -367,6 +388,7 @@ model Order {
   shipment      Shipment?
   invoices      Invoice[]
   refunds       Refund[]
+  store         Store          @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@unique([storeId, orderNumber])
   @@index([storeId, status])
@@ -416,6 +438,7 @@ model Payment {
   updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   order Order @relation(fields: [orderId], references: [id])
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@unique([provider, providerPaymentId])
   @@index([orderId])
@@ -479,6 +502,7 @@ model SupplierOrder {
   items           SupplierOrderItem[]
   shipment        Shipment?
   supplierRefunds SupplierRefund[]
+  store           Store               @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@unique([supplierId, externalOrderId])
   @@index([orderId])
@@ -516,12 +540,14 @@ model Shipment {
   shippedAt       DateTime? @map("shipped_at") @db.Timestamptz(6)
   deliveredAt     DateTime? @map("delivered_at") @db.Timestamptz(6)
   lastSyncedAt    DateTime? @map("last_synced_at") @db.Timestamptz(6)
+  returnReason    String?   @map("return_reason") @db.Text
   createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   order         Order           @relation(fields: [orderId], references: [id])
   supplierOrder SupplierOrder   @relation(fields: [supplierOrderId], references: [id])
   events        ShipmentEvent[]
+  store         Store           @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([storeId])
   @@index([storeId, status])
@@ -562,26 +588,31 @@ model Invoice {
   updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   order Order @relation(fields: [orderId], references: [id])
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@unique([storeId, invoiceNumber])
   @@map("invoices")
 }
 
 model Refund {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId          String    @map("order_id") @db.Uuid
-  paymentId        String    @map("payment_id") @db.Uuid
-  storeId          String    @map("store_id") @db.Uuid
-  amount           Decimal   @db.Decimal(12, 2)
-  currency         String    @db.VarChar(3)
-  reason           String?   @db.Text
-  status           String    @default("pending") @db.VarChar(20)
-  providerRefundId String?   @map("provider_refund_id") @db.VarChar(255)
-  processedAt      DateTime? @map("processed_at") @db.Timestamptz(6)
-  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId            String    @map("order_id") @db.Uuid
+  paymentId          String    @map("payment_id") @db.Uuid
+  storeId            String    @map("store_id") @db.Uuid
+  amount             Decimal   @db.Decimal(12, 2)
+  currency           String    @db.VarChar(3)
+  reason             String?   @db.Text
+  /// Status: pending, pending_approval, processing, succeeded, failed, cancelled
+  status             String    @default("pending") @db.VarChar(20)
+  providerRefundId   String?   @map("provider_refund_id") @db.VarChar(255)
+  processedAt        DateTime? @map("processed_at") @db.Timestamptz(6)
+  returnShippingCost Decimal?  @map("return_shipping_cost") @db.Decimal(12, 2)
+  restockingFee      Decimal?  @map("restocking_fee") @db.Decimal(12, 2)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   order Order @relation(fields: [orderId], references: [id])
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([orderId])
   @@index([storeId])
@@ -591,16 +622,18 @@ model Refund {
 }
 
 model SupplierRefund {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierOrderId  String   @map("supplier_order_id") @db.Uuid
-  supplierId       String   @map("supplier_id") @db.Uuid
-  amount           Decimal  @db.Decimal(12, 2)
-  currency         String   @db.VarChar(3)
-  status           String   @default("pending") @db.VarChar(20)
-  externalRefundId String?  @map("external_refund_id") @db.VarChar(255)
-  reason           String?  @db.Text
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierOrderId  String    @map("supplier_order_id") @db.Uuid
+  supplierId       String    @map("supplier_id") @db.Uuid
+  amount           Decimal   @db.Decimal(12, 2)
+  currency         String    @db.VarChar(3)
+  status           String    @default("pending") @db.VarChar(20)
+  externalRefundId String?   @map("external_refund_id") @db.VarChar(255)
+  reason           String?   @db.Text
+  rejectionReason  String?   @map("rejection_reason") @db.Text
+  disputedAt       DateTime? @map("disputed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   supplierOrder SupplierOrder @relation(fields: [supplierOrderId], references: [id])
 
@@ -619,6 +652,8 @@ model FinancialTransaction {
   referenceId     String?  @map("reference_id") @db.Uuid
   description     String?  @db.Text
   createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
   @@index([storeId, transactionType])
   @@index([orderId])

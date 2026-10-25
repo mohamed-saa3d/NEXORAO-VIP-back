@@ -163,3 +163,119 @@ Nothing staged yet — staging happens in Phase 3 after the schema work.
 >    also not tracked — it is empty or ignored by another mechanism. Not touched.
 > 2. `dist/` exists locally from the Phase 0 build. It is gitignored and untracked. Left in
 >    place as instructed.
+
+---
+
+## PHASE 2 — Schema modifications (FK + missing fields)
+
+Date: 2026-10-25
+
+### 2.1 FK relations to Store
+
+Added `@relation(fields: [storeId], references: [id], onDelete: Restrict)` to all 12
+`storeId` columns (11 required + `User.storeId` which existed as optional without
+`onDelete`). `onDelete: Restrict` throughout — deleting a store can never cascade into
+orders, payments or refunds.
+
+| Model | storeId nullability | onDelete |
+|---|---|---|
+| Order | required | Restrict |
+| Payment | required | Restrict |
+| Refund | required | Restrict |
+| Invoice | required | Restrict |
+| Shipment | required | Restrict |
+| SupplierOrder | required | Restrict |
+| Cart | required | Restrict |
+| Address | required | Restrict |
+| FinancialTransaction | required | Restrict |
+| User | nullable | Restrict (added; relation already existed) |
+| UserSession | nullable | Restrict |
+| SupplierConnection | nullable | Restrict |
+
+Back-relations added to `Store`: `orders`, `payments`, `refunds`, `invoices`, `shipments`,
+`supplierOrders`, `carts`, `addresses`, `financialTransactions`, `userSessions`,
+`supplierConnections` (11). `users` and `settings` already existed and were not duplicated.
+
+All existing `@@index([storeId])` / composite store indexes were left untouched.
+
+### 2.2 Missing refund / cancellation fields (9)
+
+| Model | Field | Type |
+|---|---|---|
+| Order | `cancelledAt` | `DateTime? @db.Timestamptz(6)` |
+| Order | `cancelReason` | `String? @db.Text` |
+| Order | `cancelledBy` | `String? @db.Uuid` — **no relation**, by design |
+| Order | `policySnapshot` | `Json?` |
+| Refund | `returnShippingCost` | `Decimal? @db.Decimal(12, 2)` |
+| Refund | `restockingFee` | `Decimal? @db.Decimal(12, 2)` |
+| SupplierRefund | `rejectionReason` | `String? @db.Text` |
+| SupplierRefund | `disputedAt` | `DateTime? @db.Timestamptz(6)` |
+| Shipment | `returnReason` | `String? @db.Text` |
+
+### 2.3 Status documentation
+
+`Refund.status` now carries `/// Status: pending, pending_approval, processing, succeeded, failed, cancelled`.
+Doc comment only — no enum, no behaviour change.
+
+### 2.4 Validation
+
+| Command | Exit | Output |
+|---|---|---|
+| `pnpm prisma validate` | **0** | `The schema at prisma\schema.prisma is valid 🚀` |
+| `pnpm prisma format` | **0** | `Formatted prisma\schema.prisma in 50ms 🚀` |
+
+### 2.5 JSON regeneration — FAILED, REVERTED
+
+Recreated `scripts/generate-schema-json.ts` from `b01c294` and ran it. Two of the four
+expected numbers were wrong:
+
+| Metric | Expected | Actual | Verdict |
+|---|---|
+| models | 33 | 33 | OK |
+| relations | 41 | **39** | FAIL |
+| fields | 407 | **327** | FAIL |
+| indexes | 45 | **43** | FAIL |
+
+`to_Store = 13` confirmed every new FK landed in the schema, so this is a **parser defect,
+not a schema defect**:
+
+1. The parser skips optional relations, so `UserSession → Store` and
+   `SupplierConnection → Store` (both `storeId String?`) are not emitted: 29 + 10 = 39.
+2. The 80-field shortfall cannot come from these edits (only 9 fields were added). The
+   script in `b01c294` is **not** the script that produced the committed
+   `database-schema.json`; that file was finalised in `8ad4937`, the same commit that
+   deleted the generator.
+
+Also correcting the audit: the committed JSON's `meta.totalIndexCount: 106` was never
+verified against the schema — the audit only proved the JSON was internally consistent.
+The true index count is in the 43–45 range.
+
+**Resolution (per user decision):** restored the authoritative file with
+`git checkout 8ad4937 -- docs/database-schema.json` → 33 models / 29 relations /
+398 fields / 106 meta-indexes. The generator script is **kept, untracked**, so the parser
+can be fixed deliberately later.
+
+> ⚠️ **Known staleness:** the restored JSON describes the **pre-Phase-2** schema. It lacks
+> the 12 Store FKs and the 9 new fields, and its relation count (29) predates the new
+> relations. This is accepted, documented debt. The schema file is the source of truth
+> until the parser is fixed and JSON is regenerated.
+
+### 2.6 Client regeneration
+
+`pnpm prisma generate` → exit **0**.
+`✔ Generated Prisma Client (7.10.1) to .\src\generated\prisma in 485ms`
+**41 files** total, **33** model files. Unchanged from the previous generation.
+
+### 2.7 Build
+
+| Command | Exit |
+|---|---|
+| `pnpm build` | **0** |
+| `pnpm lint` | **0** |
+
+### Phase 2 verdict
+
+**GO for migration.** The schema is valid, complete and builds. The only open item is the
+JSON doc, which is explicitly deferred by user decision and does not affect the database.
+
+Change set at commit time: `M prisma/schema.prisma`, `?? scripts/` (untracked generator).
