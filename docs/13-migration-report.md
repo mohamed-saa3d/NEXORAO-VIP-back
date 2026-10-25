@@ -457,3 +457,23 @@ DROP COLUMN "vat_rate";
 > marked with `prisma migrate resolve --rolled-back`, and `deploy` then succeeded.
 
 Verification: `pnpm prisma validate` 0 · `pnpm build` 0 · `pnpm test` 3/3
+
+### Commit 2 — remove_markup_field (20261025193000)
+
+Removed
+- `StoreSettings.markupPercentage` (was `45.00`)
+
+Rationale: 45% is a fixed business constant applied in the pricing service; storing it
+per-store invites drift between the stored value and the code constant.
+
+Migration SQL (complete content):
+```sql
+-- AlterTable
+ALTER TABLE "store_settings" DROP COLUMN "markup_percentage";
+```
+
+Also corrected the generated-JSON note: `sellingPrice` was documented as
+`ROUND(supplierCost * exchangeRate * 1.45, 2)` but no `exchangeRate` column exists.
+Now reads `ROUND(supplierCost * 1.45, 2)` with fx conversion marked as deferred.
+
+Verification: `pnpm prisma validate` 0 · `pnpm build` 0 · `pnpm test` 3/3

@@ -139,7 +139,7 @@ const RLS_PROTECTED_TABLES = [
 const NOTES = [
   "All monetary amounts use DECIMAL(12,2).",
   "All IDs are UUID via gen_random_uuid() (PostgreSQL 13+).",
-  "sellingPrice = ROUND(supplierCost * exchangeRate * 1.45, 2).",
+  "sellingPrice = ROUND(supplierCost * 1.45, 2). Exchange rate conversion is deferred to a future fx module.",
   "OrderItem snapshots (productNameSnapshot, variantSnapshot, unitSalePrice, unitSupplierCost) are immutable historical values.",
   "Invoices: UNIQUE(store_id, invoice_number).",
   "Supplier connections tokens encrypted at rest (application-level AES-256-GCM).",
