@@ -12,3 +12,12 @@ scripts/*.txt
 scripts/*.log
 scripts/.log
 scripts/tmp-.ts
+
+# Debug/temp artifacts (never commit)
+debug.txt
+err.txt
+estdout.txt
+out.txt
+output.txt
+stdout.txt
+src_output.*
