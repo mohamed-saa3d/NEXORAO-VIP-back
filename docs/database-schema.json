@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generatedAt": "2026-10-24T19:12:42.308Z",
+    "generatedAt": "2026-10-25T13:30:46.602Z",
     "prismaVersion": "7.10.1",
     "database": "PostgreSQL 17 (Neon)",
     "modelCount": 33,
-    "relationCount": 29,
+    "relationCount": 40,
     "totalIndexCount": 106,
     "tenantIsolation": "PostgreSQL RLS via app.current_store_id (set_config)"
   },
@@ -206,8 +206,107 @@
           "type": "User",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "User"
+          "relatesTo": "User",
+          "array": true
+        },
+        {
+          "name": "orders",
+          "columnName": "orders",
+          "type": "Order",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Order",
+          "array": true
+        },
+        {
+          "name": "payments",
+          "columnName": "payments",
+          "type": "Payment",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Payment",
+          "array": true
+        },
+        {
+          "name": "refunds",
+          "columnName": "refunds",
+          "type": "Refund",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Refund",
+          "array": true
+        },
+        {
+          "name": "invoices",
+          "columnName": "invoices",
+          "type": "Invoice",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Invoice",
+          "array": true
+        },
+        {
+          "name": "shipments",
+          "columnName": "shipments",
+          "type": "Shipment",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Shipment",
+          "array": true
+        },
+        {
+          "name": "supplierOrders",
+          "columnName": "supplierOrders",
+          "type": "SupplierOrder",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrder",
+          "array": true
+        },
+        {
+          "name": "carts",
+          "columnName": "carts",
+          "type": "Cart",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Cart",
+          "array": true
+        },
+        {
+          "name": "addresses",
+          "columnName": "addresses",
+          "type": "Address",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Address",
+          "array": true
+        },
+        {
+          "name": "financialTransactions",
+          "columnName": "financialTransactions",
+          "type": "FinancialTransaction",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "FinancialTransaction",
+          "array": true
+        },
+        {
+          "name": "userSessions",
+          "columnName": "userSessions",
+          "type": "UserSession",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "UserSession",
+          "array": true
+        },
+        {
+          "name": "supplierConnections",
+          "columnName": "supplierConnections",
+          "type": "SupplierConnection",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierConnection",
+          "array": true
         }
       ]
     },
@@ -482,7 +581,7 @@
           "toFields": [
             "id"
           ],
-          "onDelete": null,
+          "onDelete": "Restrict",
           "onUpdate": null
         },
         {
@@ -491,8 +590,8 @@
           "type": "UserSession",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "UserSession"
+          "relatesTo": "UserSession",
+          "array": true
         },
         {
           "name": "addresses",
@@ -500,8 +599,8 @@
           "type": "Address",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Address"
+          "relatesTo": "Address",
+          "array": true
         }
       ]
     },
@@ -631,6 +730,22 @@
             "id"
           ],
           "onDelete": "Cascade",
+          "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
           "onUpdate": null
         }
       ]
@@ -783,6 +898,22 @@
           ],
           "onDelete": "Cascade",
           "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -867,8 +998,8 @@
           "type": "SupplierConnection",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierConnection"
+          "relatesTo": "SupplierConnection",
+          "array": true
         },
         {
           "name": "products",
@@ -876,8 +1007,8 @@
           "type": "Product",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Product"
+          "relatesTo": "Product",
+          "array": true
         },
         {
           "name": "supplierProducts",
@@ -885,8 +1016,8 @@
           "type": "SupplierProduct",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierProduct"
+          "relatesTo": "SupplierProduct",
+          "array": true
         }
       ]
     },
@@ -1016,6 +1147,22 @@
           ],
           "onDelete": "Cascade",
           "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": true,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -1130,8 +1277,8 @@
           "type": "Category",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Category"
+          "relatesTo": "Category",
+          "array": true
         },
         {
           "name": "translations",
@@ -1139,8 +1286,8 @@
           "type": "CategoryTranslation",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "CategoryTranslation"
+          "relatesTo": "CategoryTranslation",
+          "array": true
         },
         {
           "name": "products",
@@ -1148,8 +1295,8 @@
           "type": "ProductCategory",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductCategory"
+          "relatesTo": "ProductCategory",
+          "array": true
         }
       ]
     },
@@ -1367,8 +1514,8 @@
           "type": "ProductTranslation",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductTranslation"
+          "relatesTo": "ProductTranslation",
+          "array": true
         },
         {
           "name": "variants",
@@ -1376,8 +1523,8 @@
           "type": "ProductVariant",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductVariant"
+          "relatesTo": "ProductVariant",
+          "array": true
         },
         {
           "name": "images",
@@ -1385,8 +1532,8 @@
           "type": "ProductImage",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductImage"
+          "relatesTo": "ProductImage",
+          "array": true
         },
         {
           "name": "categories",
@@ -1394,8 +1541,8 @@
           "type": "ProductCategory",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductCategory"
+          "relatesTo": "ProductCategory",
+          "array": true
         },
         {
           "name": "supplierLinks",
@@ -1403,8 +1550,8 @@
           "type": "SupplierProduct",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierProduct"
+          "relatesTo": "SupplierProduct",
+          "array": true
         }
       ]
     },
@@ -1712,8 +1859,8 @@
           "type": "SupplierVariant",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierVariant"
+          "relatesTo": "SupplierVariant",
+          "array": true
         },
         {
           "name": "images",
@@ -1721,8 +1868,8 @@
           "type": "ProductImage",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ProductImage"
+          "relatesTo": "ProductImage",
+          "array": true
         }
       ]
     },
@@ -2063,8 +2210,8 @@
           "type": "SupplierVariant",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierVariant"
+          "relatesTo": "SupplierVariant",
+          "array": true
         }
       ]
     },
@@ -2298,8 +2445,24 @@
           "type": "CartItem",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "CartItem"
+          "relatesTo": "CartItem",
+          "array": true
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -2594,6 +2757,34 @@
           "isRelation": false
         },
         {
+          "name": "cancelledAt",
+          "columnName": "cancelled_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "cancelReason",
+          "columnName": "cancel_reason",
+          "type": "text",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "cancelledBy",
+          "columnName": "cancelled_by",
+          "type": "uuid",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "policySnapshot",
+          "columnName": "policy_snapshot",
+          "type": "jsonb",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
@@ -2615,8 +2806,8 @@
           "type": "OrderItem",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "OrderItem"
+          "relatesTo": "OrderItem",
+          "array": true
         },
         {
           "name": "payments",
@@ -2624,8 +2815,8 @@
           "type": "Payment",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Payment"
+          "relatesTo": "Payment",
+          "array": true
         },
         {
           "name": "supplierOrder",
@@ -2649,8 +2840,8 @@
           "type": "Invoice",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Invoice"
+          "relatesTo": "Invoice",
+          "array": true
         },
         {
           "name": "refunds",
@@ -2658,8 +2849,24 @@
           "type": "Refund",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "Refund"
+          "relatesTo": "Refund",
+          "array": true
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -2985,6 +3192,22 @@
             "id"
           ],
           "onDelete": null,
+          "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
           "onUpdate": null
         }
       ]
@@ -3412,8 +3635,8 @@
           "type": "SupplierOrderItem",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierOrderItem"
+          "relatesTo": "SupplierOrderItem",
+          "array": true
         },
         {
           "name": "shipment",
@@ -3429,8 +3652,24 @@
           "type": "SupplierRefund",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "SupplierRefund"
+          "relatesTo": "SupplierRefund",
+          "array": true
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -3670,6 +3909,13 @@
           "isRelation": false
         },
         {
+          "name": "returnReason",
+          "columnName": "return_reason",
+          "type": "text",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
@@ -3723,8 +3969,24 @@
           "type": "ShipmentEvent",
           "nullable": false,
           "isRelation": true,
-          "array": true,
-          "relatesTo": "ShipmentEvent"
+          "relatesTo": "ShipmentEvent",
+          "array": true
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -3989,6 +4251,22 @@
           ],
           "onDelete": null,
           "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -4108,6 +4386,20 @@
           "isRelation": false
         },
         {
+          "name": "returnShippingCost",
+          "columnName": "return_shipping_cost",
+          "type": "decimal(12, 2)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "restockingFee",
+          "columnName": "restocking_fee",
+          "type": "decimal(12, 2)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
           "name": "createdAt",
           "columnName": "created_at",
           "type": "timestamptz",
@@ -4137,6 +4429,22 @@
             "id"
           ],
           "onDelete": null,
+          "onUpdate": null
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
           "onUpdate": null
         }
       ]
@@ -4220,6 +4528,20 @@
           "name": "reason",
           "columnName": "reason",
           "type": "text",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "rejectionReason",
+          "columnName": "rejection_reason",
+          "type": "text",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "disputedAt",
+          "columnName": "disputed_at",
+          "type": "timestamptz",
           "nullable": true,
           "isRelation": false
         },
@@ -4359,6 +4681,22 @@
           "nullable": false,
           "isRelation": false,
           "default": "now()"
+        },
+        {
+          "name": "store",
+          "columnName": "store",
+          "type": "Store",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Store",
+          "fromFields": [
+            "storeId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
         }
       ]
     },
@@ -4588,7 +4926,7 @@
       "to": "Store",
       "toField": "id",
       "type": "1-to-many",
-      "onDelete": null,
+      "onDelete": "Restrict",
       "onUpdate": null
     },
     {
@@ -4601,6 +4939,15 @@
       "onUpdate": null
     },
     {
+      "from": "UserSession",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "Address",
       "fromField": "userId",
       "to": "User",
@@ -4610,12 +4957,30 @@
       "onUpdate": null
     },
     {
+      "from": "Address",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "SupplierConnection",
       "fromField": "supplierId",
       "to": "Supplier",
       "toField": "id",
       "type": "1-to-many",
       "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierConnection",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
       "onUpdate": null
     },
     {
@@ -4686,7 +5051,7 @@
       "fromField": "productId",
       "to": "Product",
       "toField": "id",
-      "type": "junction",
+      "type": "1-to-many",
       "onDelete": "Cascade",
       "onUpdate": null
     },
@@ -4695,7 +5060,7 @@
       "fromField": "categoryId",
       "to": "Category",
       "toField": "id",
-      "type": "junction",
+      "type": "1-to-many",
       "onDelete": "Cascade",
       "onUpdate": null
     },
@@ -4736,12 +5101,30 @@
       "onUpdate": null
     },
     {
+      "from": "Cart",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "CartItem",
       "fromField": "cartId",
       "to": "Cart",
       "toField": "id",
       "type": "1-to-many",
       "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
+      "from": "Order",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
       "onUpdate": null
     },
     {
@@ -4763,12 +5146,30 @@
       "onUpdate": null
     },
     {
+      "from": "Payment",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "SupplierOrder",
       "fromField": "orderId",
       "to": "Order",
       "toField": "id",
       "type": "1-to-1",
       "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierOrder",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
       "onUpdate": null
     },
     {
@@ -4799,6 +5200,15 @@
       "onUpdate": null
     },
     {
+      "from": "Shipment",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "ShipmentEvent",
       "fromField": "shipmentId",
       "to": "Shipment",
@@ -4817,6 +5227,15 @@
       "onUpdate": null
     },
     {
+      "from": "Invoice",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "Refund",
       "fromField": "orderId",
       "to": "Order",
@@ -4826,12 +5245,30 @@
       "onUpdate": null
     },
     {
+      "from": "Refund",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "SupplierRefund",
       "fromField": "supplierOrderId",
       "to": "SupplierOrder",
       "toField": "id",
       "type": "1-to-many",
       "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "FinancialTransaction",
+      "fromField": "storeId",
+      "to": "Store",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
       "onUpdate": null
     }
   ],
@@ -4849,9 +5286,8 @@
     "carts",
     "cart_items",
     "addresses",
-    "user_sessions",
-    "users",
-    "financial_transactions"
+    "financial_transactions",
+    "supplier_refunds"
   ],
   "notes": [
     "All monetary amounts use DECIMAL(12,2).",
@@ -4861,6 +5297,7 @@
     "Invoices: UNIQUE(store_id, invoice_number).",
     "Supplier connections tokens encrypted at rest (application-level AES-256-GCM).",
     "indexes[] contains ALL index types per model: primary, unique, and regular indexes.",
-    "relations[] contains only FK-bearing sides (child models). fromField is the FK scalar field."
+    "relations[] contains only FK-bearing sides (child models). fromField is the FK scalar field.",
+    "rlsProtectedTables lists tables with RLS enabled and FORCEd; the app role must connect as a non-BYPASSRLS role (see docs/13-migration-report.md)."
   ]
 }

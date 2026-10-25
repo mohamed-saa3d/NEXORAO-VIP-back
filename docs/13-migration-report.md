@@ -389,4 +389,42 @@ upgrade: `sslmode=require` currently gives stricter-than-libpq verification.
 **GO for RLS (Phase 5).** Database is live and in sync, 33 tables + 40 FKs, client
 regenerated, schema and build clean.
 
+
+
+---
+
+## FINAL STATE
+
+### Migrations applied (5)
+1. 20261025013938_init — 33 tables
+2. 20261025014338_rls_policies — ENABLE RLS on 14 tables
+3. 20261025015429_force_rls — FORCE RLS on 14 tables
+4. 20261025015751_rls_with_check — WITH CHECK + NULLIF on 14 tables
+5. 20261025120233_supplier_refund_rls — supplier_refunds via parent
+
+### RLS coverage
+- 15 tables with rowsecurity=true, relforcerowsecurity=true
+- Enforcement role: nexora_app (NOBYPASSRLS)
+- Migration role: neondb_owner (via DATABASE_URL)
+
+### Schema
+- 33 models, 40 relations, 429 fields, 106 indexes
+
+### Tests
+- tests/integration/rls.test.ts — 3/3 pass
+
+### Build/Lint
+- pnpm build → exit 0
+- pnpm lint (src/ + prisma/ + scripts/) → exit 0
+
+### Excluded from RLS (documented)
+- stores, store_settings
+- suppliers, supplier_connections
+- products, categories, product_*
+- users, user_sessions
+- webhook_events
+- background_jobs, integration_logs
+
+### Next phase
+Phase D — Auth module.
 Uncommitted: `prisma/migrations/` (new). No other changes.

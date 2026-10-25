@@ -9,3 +9,6 @@ dist/
 scripts/*.txt
 .claude/
 .windsurf/
+scripts/*.log
+scripts/.log
+scripts/tmp-.ts
