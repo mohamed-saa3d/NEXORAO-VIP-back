@@ -1,12 +1,12 @@
 {
   "meta": {
-    "generatedAt": "2026-10-26T12:06:33.284Z",
+    "generatedAt": "2026-10-26T12:25:24.658Z",
     "prismaVersion": "7.10.1",
     "database": "PostgreSQL 17 (Neon)",
-    "modelCount": 34,
-    "relationCount": 45,
-    "totalFields": 443,
-    "totalIndexCount": 110,
+    "modelCount": 32,
+    "relationCount": 39,
+    "totalFields": 419,
+    "totalIndexCount": 105,
     "tenantIsolation": "PostgreSQL RLS via app.current_store_id (set_config)"
   },
   "stores": [
@@ -1099,24 +1099,6 @@
           "array": true
         },
         {
-          "name": "products",
-          "columnName": "products",
-          "type": "Product",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "Product",
-          "array": true
-        },
-        {
-          "name": "supplierProducts",
-          "columnName": "supplierProducts",
-          "type": "SupplierProduct",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierProduct",
-          "array": true
-        },
-        {
           "name": "supplierRefunds",
           "columnName": "supplierRefunds",
           "type": "SupplierRefund",
@@ -1302,6 +1284,12 @@
             "parentId"
           ],
           "type": "index"
+        },
+        {
+          "fields": [
+            "path"
+          ],
+          "type": "index"
         }
       ],
       "fields": [
@@ -1336,6 +1324,22 @@
           "nullable": false,
           "isRelation": false,
           "default": 0
+        },
+        {
+          "name": "depth",
+          "columnName": "depth",
+          "type": "integer",
+          "nullable": false,
+          "isRelation": false,
+          "default": 0
+        },
+        {
+          "name": "path",
+          "columnName": "path",
+          "type": "text",
+          "nullable": false,
+          "isRelation": false,
+          "default": ""
         },
         {
           "name": "status",
@@ -1499,6 +1503,9 @@
       ],
       "uniqueConstraints": [
         [
+          "aliexpressProductId"
+        ],
+        [
           "slug"
         ]
       ],
@@ -1511,15 +1518,15 @@
         },
         {
           "fields": [
-            "slug"
+            "aliexpressProductId"
           ],
           "type": "unique"
         },
         {
           "fields": [
-            "supplierId"
+            "slug"
           ],
-          "type": "index"
+          "type": "unique"
         },
         {
           "fields": [
@@ -1539,11 +1546,12 @@
           "default": "gen_random_uuid()"
         },
         {
-          "name": "supplierId",
-          "columnName": "supplier_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
+          "name": "aliexpressProductId",
+          "columnName": "aliexpress_product_id",
+          "type": "varchar(100)",
+          "nullable": true,
+          "isRelation": false,
+          "unique": true
         },
         {
           "name": "slug",
@@ -1599,22 +1607,6 @@
           "isUpdatedAt": true
         },
         {
-          "name": "supplier",
-          "columnName": "supplier",
-          "type": "Supplier",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "Supplier",
-          "fromFields": [
-            "supplierId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": null,
-          "onUpdate": null
-        },
-        {
           "name": "translations",
           "columnName": "translations",
           "type": "ProductTranslation",
@@ -1648,15 +1640,6 @@
           "nullable": false,
           "isRelation": true,
           "relatesTo": "ProductCategory",
-          "array": true
-        },
-        {
-          "name": "supplierLinks",
-          "columnName": "supplierLinks",
-          "type": "SupplierProduct",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierProduct",
           "array": true
         }
       ]
@@ -1768,6 +1751,9 @@
       ],
       "uniqueConstraints": [
         [
+          "aliexpressVariantId"
+        ],
+        [
           "sku"
         ]
       ],
@@ -1777,6 +1763,12 @@
             "id"
           ],
           "type": "primary"
+        },
+        {
+          "fields": [
+            "aliexpressVariantId"
+          ],
+          "type": "unique"
         },
         {
           "fields": [
@@ -1813,6 +1805,14 @@
           "type": "uuid",
           "nullable": false,
           "isRelation": false
+        },
+        {
+          "name": "aliexpressVariantId",
+          "columnName": "aliexpress_variant_id",
+          "type": "varchar(100)",
+          "nullable": true,
+          "isRelation": false,
+          "unique": true
         },
         {
           "name": "sku",
@@ -1868,9 +1868,23 @@
           "default": "EUR"
         },
         {
-          "name": "exchangeRateAtSync",
-          "columnName": "exchange_rate_at_sync",
+          "name": "exchangeRate",
+          "columnName": "exchange_rate",
           "type": "decimal(10, 4)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "exchangeRateSource",
+          "columnName": "exchange_rate_source",
+          "type": "varchar(20)",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "exchangeRateFetchedAt",
+          "columnName": "exchange_rate_fetched_at",
+          "type": "timestamptz",
           "nullable": true,
           "isRelation": false
         },
@@ -1958,15 +1972,6 @@
           ],
           "onDelete": "Cascade",
           "onUpdate": null
-        },
-        {
-          "name": "supplierLinks",
-          "columnName": "supplierLinks",
-          "type": "SupplierVariant",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierVariant",
-          "array": true
         },
         {
           "name": "images",
@@ -2174,283 +2179,6 @@
           ],
           "onDelete": "Cascade",
           "onUpdate": null
-        }
-      ]
-    },
-    {
-      "name": "SupplierProduct",
-      "table": "supplier_products",
-      "group": "catalog",
-      "primaryKey": [
-        "id"
-      ],
-      "uniqueConstraints": [
-        [
-          "supplierId",
-          "externalProductId"
-        ]
-      ],
-      "indexes": [
-        {
-          "fields": [
-            "id"
-          ],
-          "type": "primary"
-        },
-        {
-          "fields": [
-            "supplierId",
-            "externalProductId"
-          ],
-          "type": "unique"
-        },
-        {
-          "fields": [
-            "productId"
-          ],
-          "type": "index"
-        }
-      ],
-      "fields": [
-        {
-          "name": "id",
-          "columnName": "id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false,
-          "primaryKey": true,
-          "default": "gen_random_uuid()"
-        },
-        {
-          "name": "supplierId",
-          "columnName": "supplier_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "productId",
-          "columnName": "product_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "externalProductId",
-          "columnName": "external_product_id",
-          "type": "varchar(100)",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "supplierUrl",
-          "columnName": "supplier_url",
-          "type": "text",
-          "nullable": true,
-          "isRelation": false
-        },
-        {
-          "name": "supplierStatus",
-          "columnName": "supplier_status",
-          "type": "varchar(20)",
-          "nullable": false,
-          "isRelation": false,
-          "default": "active"
-        },
-        {
-          "name": "lastSyncedAt",
-          "columnName": "last_synced_at",
-          "type": "timestamptz",
-          "nullable": true,
-          "isRelation": false
-        },
-        {
-          "name": "rawData",
-          "columnName": "raw_data",
-          "type": "jsonb",
-          "nullable": true,
-          "isRelation": false
-        },
-        {
-          "name": "createdAt",
-          "columnName": "created_at",
-          "type": "timestamptz",
-          "nullable": false,
-          "isRelation": false,
-          "default": "now()"
-        },
-        {
-          "name": "updatedAt",
-          "columnName": "updated_at",
-          "type": "timestamptz",
-          "nullable": false,
-          "isRelation": false,
-          "isUpdatedAt": true
-        },
-        {
-          "name": "supplier",
-          "columnName": "supplier",
-          "type": "Supplier",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "Supplier",
-          "fromFields": [
-            "supplierId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": "Cascade",
-          "onUpdate": null
-        },
-        {
-          "name": "product",
-          "columnName": "product",
-          "type": "Product",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "Product",
-          "fromFields": [
-            "productId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": "Cascade",
-          "onUpdate": null
-        },
-        {
-          "name": "variants",
-          "columnName": "variants",
-          "type": "SupplierVariant",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierVariant",
-          "array": true
-        }
-      ]
-    },
-    {
-      "name": "SupplierVariant",
-      "table": "supplier_variants",
-      "group": "catalog",
-      "primaryKey": [
-        "id"
-      ],
-      "uniqueConstraints": [
-        [
-          "supplierProductId",
-          "externalVariantId"
-        ]
-      ],
-      "indexes": [
-        {
-          "fields": [
-            "id"
-          ],
-          "type": "primary"
-        },
-        {
-          "fields": [
-            "supplierProductId",
-            "externalVariantId"
-          ],
-          "type": "unique"
-        },
-        {
-          "fields": [
-            "productVariantId"
-          ],
-          "type": "index"
-        }
-      ],
-      "fields": [
-        {
-          "name": "id",
-          "columnName": "id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false,
-          "primaryKey": true,
-          "default": "gen_random_uuid()"
-        },
-        {
-          "name": "supplierProductId",
-          "columnName": "supplier_product_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "productVariantId",
-          "columnName": "product_variant_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "externalVariantId",
-          "columnName": "external_variant_id",
-          "type": "varchar(100)",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "createdAt",
-          "columnName": "created_at",
-          "type": "timestamptz",
-          "nullable": false,
-          "isRelation": false,
-          "default": "now()"
-        },
-        {
-          "name": "updatedAt",
-          "columnName": "updated_at",
-          "type": "timestamptz",
-          "nullable": false,
-          "isRelation": false,
-          "isUpdatedAt": true
-        },
-        {
-          "name": "supplierProduct",
-          "columnName": "supplierProduct",
-          "type": "SupplierProduct",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierProduct",
-          "fromFields": [
-            "supplierProductId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": "Cascade",
-          "onUpdate": null
-        },
-        {
-          "name": "productVariant",
-          "columnName": "productVariant",
-          "type": "ProductVariant",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "ProductVariant",
-          "fromFields": [
-            "productVariantId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": "Cascade",
-          "onUpdate": null
-        },
-        {
-          "name": "supplierOrderItems",
-          "columnName": "supplierOrderItems",
-          "type": "SupplierOrderItem",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierOrderItem",
-          "array": true
         }
       ]
     },
@@ -3832,12 +3560,6 @@
             "variantId"
           ],
           "type": "index"
-        },
-        {
-          "fields": [
-            "supplierVariantId"
-          ],
-          "type": "index"
         }
       ],
       "fields": [
@@ -3853,13 +3575,6 @@
         {
           "name": "supplierOrderId",
           "columnName": "supplier_order_id",
-          "type": "uuid",
-          "nullable": false,
-          "isRelation": false
-        },
-        {
-          "name": "supplierVariantId",
-          "columnName": "supplier_variant_id",
           "type": "uuid",
           "nullable": false,
           "isRelation": false
@@ -3917,22 +3632,6 @@
           "relatesTo": "ProductVariant",
           "fromFields": [
             "variantId"
-          ],
-          "toFields": [
-            "id"
-          ],
-          "onDelete": "Restrict",
-          "onUpdate": null
-        },
-        {
-          "name": "supplierVariant",
-          "columnName": "supplierVariant",
-          "type": "SupplierVariant",
-          "nullable": false,
-          "isRelation": true,
-          "relatesTo": "SupplierVariant",
-          "fromFields": [
-            "supplierVariantId"
           ],
           "toFields": [
             "id"
@@ -5208,15 +4907,6 @@
       "onUpdate": null
     },
     {
-      "from": "Product",
-      "fromField": "supplierId",
-      "to": "Supplier",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": null,
-      "onUpdate": null
-    },
-    {
       "from": "ProductTranslation",
       "fromField": "productId",
       "to": "Product",
@@ -5265,42 +4955,6 @@
       "from": "ProductCategory",
       "fromField": "categoryId",
       "to": "Category",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": "Cascade",
-      "onUpdate": null
-    },
-    {
-      "from": "SupplierProduct",
-      "fromField": "supplierId",
-      "to": "Supplier",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": "Cascade",
-      "onUpdate": null
-    },
-    {
-      "from": "SupplierProduct",
-      "fromField": "productId",
-      "to": "Product",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": "Cascade",
-      "onUpdate": null
-    },
-    {
-      "from": "SupplierVariant",
-      "fromField": "supplierProductId",
-      "to": "SupplierProduct",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": "Cascade",
-      "onUpdate": null
-    },
-    {
-      "from": "SupplierVariant",
-      "fromField": "productVariantId",
-      "to": "ProductVariant",
       "toField": "id",
       "type": "1-to-many",
       "onDelete": "Cascade",
@@ -5391,15 +5045,6 @@
       "from": "SupplierOrderItem",
       "fromField": "variantId",
       "to": "ProductVariant",
-      "toField": "id",
-      "type": "1-to-many",
-      "onDelete": "Restrict",
-      "onUpdate": null
-    },
-    {
-      "from": "SupplierOrderItem",
-      "fromField": "supplierVariantId",
-      "to": "SupplierVariant",
       "toField": "id",
       "type": "1-to-many",
       "onDelete": "Restrict",

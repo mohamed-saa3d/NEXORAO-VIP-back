@@ -152,10 +152,8 @@ model Supplier {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  connections      SupplierConnection[]
-  products         Product[]
-  supplierProducts SupplierProduct[]
-  supplierRefunds  SupplierRefund[]
+  connections     SupplierConnection[]
+  supplierRefunds SupplierRefund[]
 
   @@map("suppliers")
 }
@@ -225,25 +223,23 @@ model CategoryTranslation {
 }
 
 model Product {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierId   String    @map("supplier_id") @db.Uuid
-  slug         String    @unique @db.VarChar(255)
-  brand        String?   @db.VarChar(100)
-  status       String    @default("active") @db.VarChar(20)
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// External AliExpress product ID for ordering and sync. Never exposed to clients.
+  aliexpressProductId String?   @unique @map("aliexpress_product_id") @db.VarChar(100)
+  slug                String    @unique @db.VarChar(255)
+  brand               String?   @db.VarChar(100)
+  status              String    @default("active") @db.VarChar(20)
   /// createdBy is a UUID reference to the admin who imported the product (attribution only, no FK).
-  createdBy    String?   @map("created_by") @db.Uuid
-  lastSyncedAt DateTime? @map("last_synced_at") @db.Timestamptz(6)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdBy           String?   @map("created_by") @db.Uuid
+  lastSyncedAt        DateTime? @map("last_synced_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  supplier      Supplier             @relation(fields: [supplierId], references: [id])
-  translations  ProductTranslation[]
-  variants      ProductVariant[]
-  images        ProductImage[]
-  categories    ProductCategory[]
-  supplierLinks SupplierProduct[]
+  translations ProductTranslation[]
+  variants     ProductVariant[]
+  images       ProductImage[]
+  categories   ProductCategory[]
 
-  @@index([supplierId])
   @@index([status])
   @@map("products")
 }
@@ -266,6 +262,8 @@ model ProductTranslation {
 model ProductVariant {
   id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   productId             String    @map("product_id") @db.Uuid
+  /// External AliExpress variant ID for ordering and sync. Never exposed to clients.
+  aliexpressVariantId   String?   @unique @map("aliexpress_variant_id") @db.VarChar(100)
   sku                   String    @unique @db.VarChar(100)
   attributes            Json      @default("{}")
   barcode               String?   @db.VarChar(50)
@@ -293,7 +291,6 @@ model ProductVariant {
   updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   product            Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
-  supplierLinks      SupplierVariant[]
   images             ProductImage[]
   supplierOrderItems SupplierOrderItem[]
 
@@ -329,44 +326,6 @@ model ProductCategory {
   @@id([productId, categoryId])
   @@index([categoryId])
   @@map("product_categories")
-}
-
-model SupplierProduct {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierId        String    @map("supplier_id") @db.Uuid
-  productId         String    @map("product_id") @db.Uuid
-  externalProductId String    @map("external_product_id") @db.VarChar(100)
-  supplierUrl       String?   @map("supplier_url") @db.Text
-  supplierStatus    String    @default("active") @map("supplier_status") @db.VarChar(20)
-  lastSyncedAt      DateTime? @map("last_synced_at") @db.Timestamptz(6)
-  rawData           Json?     @map("raw_data")
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  supplier Supplier          @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  product  Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variants SupplierVariant[]
-
-  @@unique([supplierId, externalProductId])
-  @@index([productId])
-  @@map("supplier_products")
-}
-
-model SupplierVariant {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierProductId String   @map("supplier_product_id") @db.Uuid
-  productVariantId  String   @map("product_variant_id") @db.Uuid
-  externalVariantId String   @map("external_variant_id") @db.VarChar(100)
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  supplierProduct    SupplierProduct     @relation(fields: [supplierProductId], references: [id], onDelete: Cascade)
-  productVariant     ProductVariant      @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
-  supplierOrderItems SupplierOrderItem[]
-
-  @@unique([supplierProductId, externalVariantId])
-  @@index([productVariantId])
-  @@map("supplier_variants")
 }
 
 model Cart {
@@ -562,21 +521,18 @@ model SupplierOrder {
 }
 
 model SupplierOrderItem {
-  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  supplierOrderId   String  @map("supplier_order_id") @db.Uuid
-  supplierVariantId String  @map("supplier_variant_id") @db.Uuid
-  variantId         String  @map("variant_id") @db.Uuid
-  quantity          Int
-  unitCost          Decimal @map("unit_cost") @db.Decimal(12, 2)
-  currency          String  @db.VarChar(3)
+  id              String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  supplierOrderId String  @map("supplier_order_id") @db.Uuid
+  variantId       String  @map("variant_id") @db.Uuid
+  quantity        Int
+  unitCost        Decimal @map("unit_cost") @db.Decimal(12, 2)
+  currency        String  @db.VarChar(3)
 
-  supplierOrder   SupplierOrder   @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
-  productVariant  ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Restrict)
-  supplierVariant SupplierVariant @relation(fields: [supplierVariantId], references: [id], onDelete: Restrict)
+  supplierOrder  SupplierOrder  @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
 
   @@index([supplierOrderId])
   @@index([variantId])
-  @@index([supplierVariantId])
   @@map("supplier_order_items")
 }
 

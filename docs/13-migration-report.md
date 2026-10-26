@@ -562,3 +562,36 @@ the only record of them. Do not regenerate this migration.
 
 Verification: `migrate deploy` 0 · `prisma validate` 0 · `generate` ok · `build` 0 · `test` 3/3
 `migrate diff` afterwards → "This is an empty migration."
+
+### Supplier strategy — remove M:N, add AliExpress refs (20261026100000)
+
+Dropped models
+- `SupplierProduct` (table `supplier_products`)
+- `SupplierVariant` (table `supplier_variants`)
+
+Removed from `Product`
+- `supplierId` column + `supplier` relation + `@@index([supplierId])`
+- `supplierLinks SupplierProduct[]`
+
+Removed from `ProductVariant`
+- `supplierLinks SupplierVariant[]`
+
+Removed from `Supplier`
+- `products Product[]`, `supplierProducts SupplierProduct[]`
+
+Removed from `SupplierOrderItem`
+- `supplierVariantId` column + its FK + its index
+- (the `supplierVariant` relation and `ProductVariant.supplierOrderItems` /
+  `SupplierVariant.supplierOrderItems` back-relations go with the models)
+
+Added
+- `Product.aliexpressProductId String? @unique` — external AliExpress product id
+- `ProductVariant.aliexpressVariantId String? @unique` — external AliExpress variant id
+
+Migration SQL also drops 6 FKs and 2 indexes on the removed columns/tables, and creates
+2 unique indexes. Verified `migrate deploy` applied all 14 statements.
+
+Resulting counts: 32 models · 39 relations · 419 fields · 105 indexes
+
+Verification: `migrate deploy` 0 · `validate` 0 · `generate` ok · `tsc --noEmit` 0 ·
+`test` 3/3 · post-apply `migrate diff` → "This is an empty migration."
