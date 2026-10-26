@@ -620,6 +620,7 @@ function main(): void {
       database: "PostgreSQL 17 (Neon)",
       modelCount: models.length,
       relationCount: relations.length,
+      totalFields: fieldCount,
       totalIndexCount: indexCount,
       tenantIsolation: "PostgreSQL RLS via app.current_store_id (set_config)",
     },
