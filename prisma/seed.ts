@@ -86,7 +86,7 @@ async function main() {
     },
   });
 
-  // --- 4. Super admin ------------------------------------------------------
+  // --- 4. Admin ------------------------------------------------------------
   // @@unique([storeId, email]) does NOT prevent duplicates when storeId IS NULL
   // in PostgreSQL, so upsert cannot be used here. findFirst + create instead.
   const existingAdmin = await prisma.user.findFirst({
@@ -103,8 +103,8 @@ async function main() {
         storeId: null,
         email: adminEmail,
         passwordHash,
-        name: 'Super Admin',
-        role: 'super_admin',
+        name: 'Admin',
+        role: 'admin',
         status: 'active',
         emailVerifiedAt: new Date(),
       },

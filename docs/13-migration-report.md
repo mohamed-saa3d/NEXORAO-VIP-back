@@ -508,3 +508,23 @@ Still no FK, now documented in the schema:
 - `Product.createdBy` — attribution only (admin who imported the product)
 
 Verification: `pnpm prisma validate` 0 · `prisma generate` ok · `pnpm build` 0 · `pnpm test` 3/3
+
+### Commit 5 — role rename + partial-index docs + JSON regen (no migration)
+
+Renamed
+- Role `"super_admin"` → `"admin"` (storeId=NULL, manages all stores)
+- `User.role` now carries a `///` doc comment listing the two roles
+
+Documented in `schema.prisma` (no DB change)
+- `SupplierConnection` partial indexes from `20261025014338_rls_policies`:
+  `supplier_connections_supplier_global_unique` (supplier_id WHERE store_id IS NULL) and
+  `supplier_connections_supplier_store_unique` (supplier_id, store_id WHERE store_id IS NOT NULL)
+
+No migration needed — strings and comments only.
+
+JSON regenerated (`npx tsx scripts/generate-schema-json.ts`)
+- models=34 · relations=45 · fields=443 · indexes=110 · rlsProtectedTables=15
+- Confirmed absent: `vatRate`, `vatIncludedInPrice`, `markupPercentage`
+- Confirmed present: corrected `sellingPrice = ROUND(supplierCost * 1.45, 2)` note
+
+Verification: `pnpm build` 0 · `pnpm lint` 0 · `pnpm test` 3/3

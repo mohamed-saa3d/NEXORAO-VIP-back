@@ -1,11 +1,11 @@
 {
   "meta": {
-    "generatedAt": "2026-10-25T13:30:46.602Z",
+    "generatedAt": "2026-10-26T09:28:36.316Z",
     "prismaVersion": "7.10.1",
     "database": "PostgreSQL 17 (Neon)",
-    "modelCount": 33,
-    "relationCount": 40,
-    "totalIndexCount": 106,
+    "modelCount": 34,
+    "relationCount": 45,
+    "totalIndexCount": 110,
     "tenantIsolation": "PostgreSQL RLS via app.current_store_id (set_config)"
   },
   "stores": [
@@ -370,30 +370,6 @@
           "default": 1
         },
         {
-          "name": "vatRate",
-          "columnName": "vat_rate",
-          "type": "decimal(5, 4)",
-          "nullable": false,
-          "isRelation": false,
-          "default": 0.19
-        },
-        {
-          "name": "vatIncludedInPrice",
-          "columnName": "vat_included_in_price",
-          "type": "boolean",
-          "nullable": false,
-          "isRelation": false,
-          "default": true
-        },
-        {
-          "name": "markupPercentage",
-          "columnName": "markup_percentage",
-          "type": "decimal(5, 2)",
-          "nullable": false,
-          "isRelation": false,
-          "default": 45
-        },
-        {
           "name": "allowedLocales",
           "columnName": "allowed_locales",
           "type": "text[]",
@@ -601,6 +577,15 @@
           "isRelation": true,
           "relatesTo": "Address",
           "array": true
+        },
+        {
+          "name": "verificationTokens",
+          "columnName": "verificationTokens",
+          "type": "VerificationToken",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "VerificationToken",
+          "array": true
         }
       ]
     },
@@ -746,6 +731,117 @@
             "id"
           ],
           "onDelete": "Restrict",
+          "onUpdate": null
+        }
+      ]
+    },
+    {
+      "name": "VerificationToken",
+      "table": "verification_tokens",
+      "group": "misc",
+      "primaryKey": [
+        "id"
+      ],
+      "uniqueConstraints": [
+        [
+          "tokenHash"
+        ]
+      ],
+      "indexes": [
+        {
+          "fields": [
+            "id"
+          ],
+          "type": "primary"
+        },
+        {
+          "fields": [
+            "tokenHash"
+          ],
+          "type": "unique"
+        },
+        {
+          "fields": [
+            "userId",
+            "purpose"
+          ],
+          "type": "index"
+        },
+        {
+          "fields": [
+            "expiresAt"
+          ],
+          "type": "index"
+        }
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "nullable": false,
+          "isRelation": false,
+          "primaryKey": true,
+          "default": "gen_random_uuid()"
+        },
+        {
+          "name": "userId",
+          "columnName": "user_id",
+          "type": "uuid",
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "tokenHash",
+          "columnName": "token_hash",
+          "type": "varchar(64)",
+          "nullable": false,
+          "isRelation": false,
+          "unique": true
+        },
+        {
+          "name": "purpose",
+          "columnName": "purpose",
+          "type": "varchar(30)",
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "expiresAt",
+          "columnName": "expires_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isRelation": false
+        },
+        {
+          "name": "consumedAt",
+          "columnName": "consumed_at",
+          "type": "timestamptz",
+          "nullable": true,
+          "isRelation": false
+        },
+        {
+          "name": "createdAt",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "nullable": false,
+          "isRelation": false,
+          "default": "now()"
+        },
+        {
+          "name": "user",
+          "columnName": "user",
+          "type": "User",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "User",
+          "fromFields": [
+            "userId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Cascade",
           "onUpdate": null
         }
       ]
@@ -1017,6 +1113,15 @@
           "nullable": false,
           "isRelation": true,
           "relatesTo": "SupplierProduct",
+          "array": true
+        },
+        {
+          "name": "supplierRefunds",
+          "columnName": "supplierRefunds",
+          "type": "SupplierRefund",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierRefund",
           "array": true
         }
       ]
@@ -1870,6 +1975,15 @@
           "isRelation": true,
           "relatesTo": "ProductImage",
           "array": true
+        },
+        {
+          "name": "supplierOrderItems",
+          "columnName": "supplierOrderItems",
+          "type": "SupplierOrderItem",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrderItem",
+          "array": true
         }
       ]
     },
@@ -2327,6 +2441,15 @@
           ],
           "onDelete": "Cascade",
           "onUpdate": null
+        },
+        {
+          "name": "supplierOrderItems",
+          "columnName": "supplierOrderItems",
+          "type": "SupplierOrderItem",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierOrderItem",
+          "array": true
         }
       ]
     },
@@ -3209,6 +3332,15 @@
           ],
           "onDelete": "Restrict",
           "onUpdate": null
+        },
+        {
+          "name": "refunds",
+          "columnName": "refunds",
+          "type": "Refund",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Refund",
+          "array": true
         }
       ]
     },
@@ -3773,6 +3905,38 @@
             "id"
           ],
           "onDelete": "Cascade",
+          "onUpdate": null
+        },
+        {
+          "name": "productVariant",
+          "columnName": "productVariant",
+          "type": "ProductVariant",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "ProductVariant",
+          "fromFields": [
+            "variantId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
+        },
+        {
+          "name": "supplierVariant",
+          "columnName": "supplierVariant",
+          "type": "SupplierVariant",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "SupplierVariant",
+          "fromFields": [
+            "supplierVariantId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
           "onUpdate": null
         }
       ]
@@ -4432,6 +4596,22 @@
           "onUpdate": null
         },
         {
+          "name": "payment",
+          "columnName": "payment",
+          "type": "Payment",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Payment",
+          "fromFields": [
+            "paymentId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
+          "onUpdate": null
+        },
+        {
           "name": "store",
           "columnName": "store",
           "type": "Store",
@@ -4575,6 +4755,22 @@
             "id"
           ],
           "onDelete": null,
+          "onUpdate": null
+        },
+        {
+          "name": "supplier",
+          "columnName": "supplier",
+          "type": "Supplier",
+          "nullable": false,
+          "isRelation": true,
+          "relatesTo": "Supplier",
+          "fromFields": [
+            "supplierId"
+          ],
+          "toFields": [
+            "id"
+          ],
+          "onDelete": "Restrict",
           "onUpdate": null
         }
       ]
@@ -4948,6 +5144,15 @@
       "onUpdate": null
     },
     {
+      "from": "VerificationToken",
+      "fromField": "userId",
+      "to": "User",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Cascade",
+      "onUpdate": null
+    },
+    {
       "from": "Address",
       "fromField": "userId",
       "to": "User",
@@ -5182,6 +5387,24 @@
       "onUpdate": null
     },
     {
+      "from": "SupplierOrderItem",
+      "fromField": "variantId",
+      "to": "ProductVariant",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierOrderItem",
+      "fromField": "supplierVariantId",
+      "to": "SupplierVariant",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
       "from": "Shipment",
       "fromField": "orderId",
       "to": "Order",
@@ -5246,6 +5469,15 @@
     },
     {
       "from": "Refund",
+      "fromField": "paymentId",
+      "to": "Payment",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
+      "onUpdate": null
+    },
+    {
+      "from": "Refund",
       "fromField": "storeId",
       "to": "Store",
       "toField": "id",
@@ -5260,6 +5492,15 @@
       "toField": "id",
       "type": "1-to-many",
       "onDelete": null,
+      "onUpdate": null
+    },
+    {
+      "from": "SupplierRefund",
+      "fromField": "supplierId",
+      "to": "Supplier",
+      "toField": "id",
+      "type": "1-to-many",
+      "onDelete": "Restrict",
       "onUpdate": null
     },
     {
@@ -5292,7 +5533,7 @@
   "notes": [
     "All monetary amounts use DECIMAL(12,2).",
     "All IDs are UUID via gen_random_uuid() (PostgreSQL 13+).",
-    "sellingPrice = ROUND(supplierCost * exchangeRate * 1.45, 2).",
+    "sellingPrice = ROUND(supplierCost * 1.45, 2). Exchange rate conversion is deferred to a future fx module.",
     "OrderItem snapshots (productNameSnapshot, variantSnapshot, unitSalePrice, unitSupplierCost) are immutable historical values.",
     "Invoices: UNIQUE(store_id, invoice_number).",
     "Supplier connections tokens encrypted at rest (application-level AES-256-GCM).",

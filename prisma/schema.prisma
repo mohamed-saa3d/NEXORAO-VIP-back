@@ -64,6 +64,7 @@ model User {
   passwordHash    String    @map("password_hash") @db.VarChar(255)
   name            String?   @db.VarChar(255)
   phone           String?   @db.VarChar(50)
+  /// Role: admin | customer. Admin has storeId=NULL (manages all stores).
   role            String    @default("customer") @db.VarChar(20)
   status          String    @default("active") @db.VarChar(20)
   emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
@@ -175,6 +176,11 @@ model SupplierConnection {
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   store    Store?   @relation(fields: [storeId], references: [id], onDelete: Restrict)
 
+  /// A supplier can have either ONE global connection (storeId NULL)
+  /// or one PER-STORE connection. Enforced by two partial indexes created in
+  /// migration 20261025014338_rls_policies (not in Prisma schema):
+  ///   supplier_connections_supplier_global_unique (supplier_id WHERE store_id IS NULL)
+  ///   supplier_connections_supplier_store_unique (supplier_id, store_id WHERE store_id IS NOT NULL)
   @@unique([supplierId, storeId])
   @@map("supplier_connections")
 }
