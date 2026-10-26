@@ -491,3 +491,20 @@ Rationale for no RLS: the table is reached only by hashed token during the post-
 reset/verify flows, never by store scope. Documented in the migration SQL itself.
 
 Verification: `pnpm prisma validate` 0 · `prisma generate` ok · `pnpm build` 0 · `pnpm test` 3/3
+
+### Commit 4 — add_missing_fks (20261025203000)
+
+FKs added (4)
+- `Refund.paymentId` → `Payment`
+- `SupplierOrderItem.variantId` → `ProductVariant`
+- `SupplierOrderItem.supplierVariantId` → `SupplierVariant`
+- `SupplierRefund.supplierId` → `Supplier`
+
+All four are `ON DELETE RESTRICT ON UPDATE CASCADE` — no cascade deletes on financial
+records. Verified line-by-line before applying.
+
+Still no FK, now documented in the schema:
+- `Order.cancelledBy` — attribution only; actor may be deleted / super-admin / system
+- `Product.createdBy` — attribution only (admin who imported the product)
+
+Verification: `pnpm prisma validate` 0 · `prisma generate` ok · `pnpm build` 0 · `pnpm test` 3/3
