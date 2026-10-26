@@ -477,3 +477,17 @@ Also corrected the generated-JSON note: `sellingPrice` was documented as
 Now reads `ROUND(supplierCost * 1.45, 2)` with fx conversion marked as deferred.
 
 Verification: `pnpm prisma validate` 0 · `pnpm build` 0 · `pnpm test` 3/3
+
+### Commit 3 — add_verification_token (20261025200000)
+
+Added
+- `VerificationToken` model (password reset + email verification)
+
+Fields: `id, userId, tokenHash (unique, VARCHAR(64)), purpose, expiresAt, consumedAt, createdAt`
+Indexes: `UNIQUE(token_hash)`, `(user_id, purpose)`, `(expires_at)`
+FK: `user_id → users(id) ON DELETE CASCADE`
+
+Rationale for no RLS: the table is reached only by hashed token during the post-auth
+reset/verify flows, never by store scope. Documented in the migration SQL itself.
+
+Verification: `pnpm prisma validate` 0 · `prisma generate` ok · `pnpm build` 0 · `pnpm test` 3/3
