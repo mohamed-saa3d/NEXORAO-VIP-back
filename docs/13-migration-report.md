@@ -528,3 +528,17 @@ JSON regenerated (`npx tsx scripts/generate-schema-json.ts`)
 - Confirmed present: corrected `sellingPrice = ROUND(supplierCost * 1.45, 2)` note
 
 Verification: `pnpm build` 0 · `pnpm lint` 0 · `pnpm test` 3/3
+
+### Category hierarchy — depth + materialized path (20261026090000)
+
+Added to `Category`
+- `depth Int @default(0)` — root = 0
+- `path String @default("") @db.Text` — slash-separated UUIDs root → node
+- `@@index([path])` — subtree queries via `path LIKE 'root/%'`
+
+Migration SQL adds both columns + index, then backfills with a `DO $$ … LOOP` block:
+roots get `path = id::text, depth = 0`, then children are resolved iteratively so
+arbitrary depth works. Guarded by `path = ''`, so re-running on a populated table is a
+no-op.
+
+Verification: `prisma validate` 0 · `migrate deploy` 0 · `generate` ok · `build` 0 · `test` 3/3
