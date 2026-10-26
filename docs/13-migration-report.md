@@ -542,3 +542,23 @@ arbitrary depth works. Guarded by `path = ''`, so re-running on a populated tabl
 no-op.
 
 Verification: `prisma validate` 0 · `migrate deploy` 0 · `generate` ok · `build` 0 · `test` 3/3
+
+### Stock CHECK constraints + structured fx fields (20261026093000)
+
+CHECK constraints (not expressible in `schema.prisma`)
+- `product_variants_available_non_negative` — `available_quantity >= 0`
+- `product_variants_reserved_non_negative` — `reserved_quantity >= 0`
+- `product_variants_reserved_le_available` — `reserved_quantity <= available_quantity`
+
+fx restructure on `ProductVariant`
+- dropped `exchange_rate_at_sync`
+- added `exchangeRate` (decimal 10,4), `exchangeRateSource` (varchar 20),
+  `exchangeRateFetchedAt` (timestamptz)
+- `reservedQuantity` documented: displayed stock = available − reserved
+
+Because the CHECKs live only in SQL, `prisma migrate diff` reports **no drift** (Prisma
+does not model CHECK constraints) — they are invisible to introspection, so this file is
+the only record of them. Do not regenerate this migration.
+
+Verification: `migrate deploy` 0 · `prisma validate` 0 · `generate` ok · `build` 0 · `test` 3/3
+`migrate diff` afterwards → "This is an empty migration."
